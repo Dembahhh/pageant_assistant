@@ -1,0 +1,245 @@
+{
+  "version": "1.0",
+  "questions": [
+    {
+      "id": "q001",
+      "text": "What is the most important lesson you have learned from failure?",
+      "pageant_type": "miss_universe",
+      "question_type": "personal",
+      "difficulty": "beginner",
+      "tags": ["resilience", "growth"]
+    },
+    {
+      "id": "q002",
+      "text": "Who has had the greatest influence on the woman you are becoming, and why?",
+      "pageant_type": "general",
+      "question_type": "personal",
+      "difficulty": "beginner",
+      "tags": ["identity", "gratitude", "mentorship"]
+    },
+    {
+      "id": "q003",
+      "text": "What is one thing people would be surprised to learn about you?",
+      "pageant_type": "miss_usa",
+      "question_type": "personal",
+      "difficulty": "beginner",
+      "tags": ["authenticity", "personality"]
+    },
+    {
+      "id": "q004",
+      "text": "Describe a moment that fundamentally changed the way you see the world.",
+      "pageant_type": "miss_universe",
+      "question_type": "personal",
+      "difficulty": "intermediate",
+      "tags": ["perspective", "growth", "empathy"]
+    },
+    {
+      "id": "q005",
+      "text": "What does confidence mean to you, and how do you practice it daily?",
+      "pageant_type": "general",
+      "question_type": "personal",
+      "difficulty": "intermediate",
+      "tags": ["confidence", "self-awareness"]
+    },
+    {
+      "id": "q006",
+      "text": "If the judges could only remember one thing about you after tonight, what should it be?",
+      "pageant_type": "miss_universe",
+      "question_type": "personal",
+      "difficulty": "advanced",
+      "tags": ["identity", "impact", "memorable"]
+    },
+    {
+      "id": "q007",
+      "text": "What is the most pressing issue facing young women today?",
+      "pageant_type": "miss_universe",
+      "question_type": "issues_based",
+      "difficulty": "intermediate",
+      "tags": ["gender", "youth", "social issues"]
+    },
+    {
+      "id": "q008",
+      "text": "How should society address the mental health crisis among teenagers?",
+      "pageant_type": "general",
+      "question_type": "issues_based",
+      "difficulty": "intermediate",
+      "tags": ["mental health", "youth", "policy"]
+    },
+    {
+      "id": "q009",
+      "text": "What role should social media play in shaping public opinion?",
+      "pageant_type": "miss_usa",
+      "question_type": "issues_based",
+      "difficulty": "advanced",
+      "tags": ["technology", "media", "influence"]
+    },
+    {
+      "id": "q010",
+      "text": "Do you think beauty pageants are still relevant in today's world? Why or why not?",
+      "pageant_type": "miss_universe",
+      "question_type": "issues_based",
+      "difficulty": "advanced",
+      "tags": ["pageantry", "relevance", "self-awareness"]
+    },
+    {
+      "id": "q011",
+      "text": "What is one policy change that would have the greatest impact on gender equality?",
+      "pageant_type": "miss_world",
+      "question_type": "issues_based",
+      "difficulty": "advanced",
+      "tags": ["gender equality", "policy", "advocacy"]
+    },
+    {
+      "id": "q012",
+      "text": "How can communities better support working mothers?",
+      "pageant_type": "general",
+      "question_type": "issues_based",
+      "difficulty": "beginner",
+      "tags": ["family", "support", "community"]
+    },
+    {
+      "id": "q013",
+      "text": "If you were given one million dollars for a cause, where would you direct it and why?",
+      "pageant_type": "miss_universe",
+      "question_type": "advocacy",
+      "difficulty": "beginner",
+      "tags": ["philanthropy", "priorities", "impact"]
+    },
+    {
+      "id": "q014",
+      "text": "What is an issue you believe does not get enough attention, and what would you do about it?",
+      "pageant_type": "miss_world",
+      "question_type": "advocacy",
+      "difficulty": "intermediate",
+      "tags": ["awareness", "action", "passion"]
+    },
+    {
+      "id": "q015",
+      "text": "How would you use the title to create lasting change, not just awareness?",
+      "pageant_type": "miss_universe",
+      "question_type": "advocacy",
+      "difficulty": "advanced",
+      "tags": ["impact", "strategy", "leadership"]
+    },
+    {
+      "id": "q016",
+      "text": "What does 'Beauty with a Purpose' mean to you?",
+      "pageant_type": "miss_world",
+      "question_type": "advocacy",
+      "difficulty": "beginner",
+      "tags": ["purpose", "beauty", "service"]
+    },
+    {
+      "id": "q017",
+      "text": "Describe your platform and why it matters right now.",
+      "pageant_type": "general",
+      "question_type": "advocacy",
+      "difficulty": "intermediate",
+      "tags": ["platform", "relevance", "passion"]
+    },
+    {
+      "id": "q018",
+      "text": "If you could sit down with any world leader, who would it be and what would you discuss?",
+      "pageant_type": "miss_universe",
+      "question_type": "advocacy",
+      "difficulty": "advanced",
+      "tags": ["global awareness", "diplomacy", "leadership"]
+    },
+    {
+      "id": "q019",
+      "text": "What makes a great leader in today's world?",
+      "pageant_type": "miss_universe",
+      "question_type": "leadership",
+      "difficulty": "beginner",
+      "tags": ["leadership", "vision", "qualities"]
+    },
+    {
+      "id": "q020",
+      "text": "How would you represent your country on a global stage?",
+      "pageant_type": "miss_universe",
+      "question_type": "leadership",
+      "difficulty": "intermediate",
+      "tags": ["representation", "culture", "diplomacy"]
+    },
+    {
+      "id": "q021",
+      "text": "Describe a time when you had to lead in a difficult or unpopular situation.",
+      "pageant_type": "general",
+      "question_type": "leadership",
+      "difficulty": "intermediate",
+      "tags": ["courage", "leadership", "resilience"]
+    },
+    {
+      "id": "q022",
+      "text": "What is the difference between influence and leadership?",
+      "pageant_type": "miss_universe",
+      "question_type": "leadership",
+      "difficulty": "advanced",
+      "tags": ["influence", "leadership", "nuance"]
+    },
+    {
+      "id": "q023",
+      "text": "As a titleholder, how would you balance personal ambition with public service?",
+      "pageant_type": "miss_world",
+      "question_type": "leadership",
+      "difficulty": "advanced",
+      "tags": ["balance", "service", "ambition"]
+    },
+    {
+      "id": "q024",
+      "text": "What would you say to young girls who feel their voice does not matter?",
+      "pageant_type": "general",
+      "question_type": "leadership",
+      "difficulty": "beginner",
+      "tags": ["empowerment", "youth", "voice"]
+    },
+    {
+      "id": "q025",
+      "text": "If you could have dinner with any three people, living or dead, who would they be and why?",
+      "pageant_type": "miss_usa",
+      "question_type": "fun_creative",
+      "difficulty": "beginner",
+      "tags": ["personality", "values", "creativity"]
+    },
+    {
+      "id": "q026",
+      "text": "You have 30 seconds to convince someone to visit your hometown. Go.",
+      "pageant_type": "general",
+      "question_type": "fun_creative",
+      "difficulty": "intermediate",
+      "tags": ["hometown", "persuasion", "personality"]
+    },
+    {
+      "id": "q027",
+      "text": "If you were not competing in pageants, what would you be doing right now?",
+      "pageant_type": "general",
+      "question_type": "fun_creative",
+      "difficulty": "beginner",
+      "tags": ["ambition", "personality", "honesty"]
+    },
+    {
+      "id": "q028",
+      "text": "What is the most spontaneous thing you have ever done?",
+      "pageant_type": "miss_usa",
+      "question_type": "fun_creative",
+      "difficulty": "beginner",
+      "tags": ["personality", "adventure", "authenticity"]
+    },
+    {
+      "id": "q029",
+      "text": "If you could wake up tomorrow with one new skill fully mastered, what would it be?",
+      "pageant_type": "general",
+      "question_type": "fun_creative",
+      "difficulty": "intermediate",
+      "tags": ["aspiration", "growth", "creativity"]
+    },
+    {
+      "id": "q030",
+      "text": "Describe yourself in three words, then prove one of them wrong.",
+      "pageant_type": "miss_universe",
+      "question_type": "fun_creative",
+      "difficulty": "advanced",
+      "tags": ["self-awareness", "wit", "depth"]
+    }
+  ]
+}

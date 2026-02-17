@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pageant-assistant"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "langgraph>=0.2",
+    "langchain>=0.3",
+    "langchain-community>=0.3",
+    "langchain-groq>=0.2",
+    "chromadb>=0.5",
+    "python-dotenv>=1.0",
+    "duckduckgo-search>=6.0",
+    "pydantic>=2.0",
+    "streamlit>=1.38",
+    "groq>=0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+observability = ["langsmith"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

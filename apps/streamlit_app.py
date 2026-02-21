@@ -7,6 +7,11 @@ load_dotenv()
 from pageant_assistant.graphs.refiner import build_refiner_graph
 from pageant_assistant.questions.bank import get_random_question, get_filter_options
 from pageant_assistant.voice.audio import transcribe_audio, synthesize_speech
+from pageant_assistant.personas.manager import (
+    list_personas,
+    load_persona,
+    format_persona_context,
+)
 from pageant_assistant.config.settings import (
     GROQ_API_KEY,
     STYLE_PRESETS,
@@ -18,7 +23,6 @@ from pageant_assistant.config.settings import (
 
 st.set_page_config(
     page_title="Pageant AI Coach",
-    page_icon="👑",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -34,6 +38,10 @@ if "transcribed_text" not in st.session_state:
     st.session_state.transcribed_text = ""
 if "result" not in st.session_state:
     st.session_state.result = None
+if "active_persona_id" not in st.session_state:
+    st.session_state.active_persona_id = None
+if "active_persona" not in st.session_state:
+    st.session_state.active_persona = None
 
 # --- CSS ---
 st.markdown("""
@@ -186,6 +194,7 @@ st.markdown("""
         border: 1px solid #252535 !important;
     }
 
+    [data-testid="stSidebarNav"] ul {display: none;}
     #MainMenu, footer, header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
@@ -210,6 +219,49 @@ if not GROQ_API_KEY:
 filters = get_filter_options()
 
 with st.sidebar:
+    # --- Profile picker ---
+    st.markdown(
+        '<div class="section-label">My Profile</div>',
+        unsafe_allow_html=True,
+    )
+
+    profiles = list_personas()
+    profile_options = ["(No profile selected)"] + [
+        f"{p['name']} ({p['country']})" for p in profiles
+    ]
+    profile_ids = [None] + [p["id"] for p in profiles]
+
+    current_idx = 0
+    if st.session_state.active_persona_id in profile_ids:
+        current_idx = profile_ids.index(st.session_state.active_persona_id)
+
+    selected_idx = st.selectbox(
+        "Active profile",
+        options=range(len(profile_options)),
+        index=current_idx,
+        format_func=lambda i: profile_options[i],
+        key="persona_selector",
+        label_visibility="collapsed",
+    )
+
+    selected_persona_id = profile_ids[selected_idx]
+    if selected_persona_id != st.session_state.active_persona_id:
+        st.session_state.active_persona_id = selected_persona_id
+        if selected_persona_id:
+            st.session_state.active_persona = load_persona(selected_persona_id)
+        else:
+            st.session_state.active_persona = None
+        st.session_state.result = None
+
+    try:
+        st.page_link("pages/1_My_Profile.py", label="Edit My Profile", use_container_width=True)
+    except Exception:
+        pass
+
+    if not profiles:
+        st.caption("Head over to **My Profile** to set up your contestant profile.")
+
+    st.divider()
     st.markdown('<div class="section-label">Configuration</div>', unsafe_allow_html=True)
 
     time_limit = st.radio(
@@ -355,6 +407,12 @@ with col_output:
                     status.write("Analyzing the question...")
                     graph = build_refiner_graph()
 
+                    persona_ctx = ""
+                    if st.session_state.active_persona:
+                        persona_ctx = format_persona_context(
+                            st.session_state.active_persona
+                        )
+
                     result = graph.invoke({
                         "question": st.session_state.current_question["text"],
                         "raw_answer": raw_answer,
@@ -363,6 +421,8 @@ with col_output:
                         "question_id": st.session_state.current_question["id"],
                         "input_mode": answer_mode.lower(),
                         "iteration_count": 0,
+                        "persona_id": st.session_state.active_persona_id or "",
+                        "persona_context": persona_ctx,
                     })
 
                     st.session_state.result = result
@@ -429,6 +489,57 @@ with col_output:
             )
 
         with tab_report:
+            # --- Structured rubric scores (M3) ---
+            critic_scores = result.get("critic_scores")
+            if critic_scores and critic_scores.get("dimension_scores"):
+                overall = critic_scores.get("overall_score", 0)
+                st.markdown(
+                    f"<div style='font-family: Cormorant Garamond, serif; "
+                    f"font-size: 2rem; font-weight: 600; text-align: center; "
+                    f"color: #c9a84c; margin-bottom: 0.5rem;'>"
+                    f"{overall:.1f}<span style='font-size: 1rem; color: #6b6b7b;'> / 10</span>"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
+                for dim in critic_scores["dimension_scores"]:
+                    score = dim.get("score", 0)
+                    pct = int(score * 10)
+                    bar_color = "#c9a84c" if score >= 7 else "#6b6b7b" if score >= 5 else "#a04040"
+                    st.markdown(
+                        f"<div style='font-family: Inter, sans-serif; font-size: 0.8rem; "
+                        f"color: #e0e0e0; margin-bottom: 0.15rem;'>"
+                        f"<strong>{dim.get('name', '')}</strong> — "
+                        f"<span style='color: {bar_color};'>{score:.1f}</span>"
+                        f"<span style='color: #4a4a5a; margin-left: 0.5rem;'>{dim.get('reason', '')}</span>"
+                        f"</div>"
+                        f"<div style='background: #1e1e2a; border-radius: 3px; height: 4px; "
+                        f"margin-bottom: 0.6rem;'>"
+                        f"<div style='background: {bar_color}; width: {pct}%; height: 100%; "
+                        f"border-radius: 3px;'></div></div>",
+                        unsafe_allow_html=True,
+                    )
+
+                # Genericness / risk flags
+                flags = critic_scores.get("genericness_flags", []) + critic_scores.get("risk_flags", [])
+                if flags:
+                    flag_text = ", ".join(f.replace("_", " ") for f in flags)
+                    st.warning(f"Flags: {flag_text}")
+
+                # Top fixes
+                fixes = critic_scores.get("top_fixes", [])
+                if fixes:
+                    st.markdown(
+                        '<div class="section-label" style="margin-top: 1rem;">Top Fixes</div>',
+                        unsafe_allow_html=True,
+                    )
+                    for fix in fixes:
+                        st.markdown(
+                            f"- **{fix.get('target', '')}**: {fix.get('instruction', '')}",
+                        )
+
+                st.divider()
+
+            # --- Full coach report text ---
             st.markdown(result.get("coach_report", ""))
 
     elif st.session_state.current_question and not run_btn:

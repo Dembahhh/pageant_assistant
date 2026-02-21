@@ -39,6 +39,11 @@ DATA_DIR = PROJECT_ROOT / "data"
 CHROMA_DIR = DATA_DIR / "chroma"
 RUBRICS_DIR = PROJECT_ROOT / "src" / "pageant_assistant" / "rubrics"
 QUESTIONS_DIR = DATA_DIR / "questions"
+PERSONAS_DIR = DATA_DIR / "personas"
+EXEMPLARS_DIR = DATA_DIR / "exemplars"
+
+# --- Rubric ---
+DEFAULT_RUBRIC = "miss_universe"
 
 # --- Voice Configuration ---
 STT_MODEL = "whisper-large-v3-turbo"

@@ -1,0 +1,59 @@
+{
+  "pageant": "Miss Universe",
+  "version": "1.0",
+  "dimensions": [
+    {
+      "name": "Directness & Clarity",
+      "weight": 1.0,
+      "description": "Does the first sentence directly answer the question? Is the answer easy to follow?"
+    },
+    {
+      "name": "Structure & Flow",
+      "weight": 1.0,
+      "description": "Does it follow a logical arc — answer, meaning, anchor, application, close? Smooth transitions?"
+    },
+    {
+      "name": "Authenticity & Specificity",
+      "weight": 1.2,
+      "description": "Does it sound real and personal, not templated? Uses contestant's actual stories and platform if available?"
+    },
+    {
+      "name": "Leadership & Agency",
+      "weight": 1.0,
+      "description": "Shows vision or concrete action, not just opinion? Connects to the contestant's platform?"
+    },
+    {
+      "name": "Worldview & Relevance",
+      "weight": 0.8,
+      "description": "Appropriate global framing when the question calls for it? Balanced perspective?"
+    },
+    {
+      "name": "Closing Strength",
+      "weight": 1.0,
+      "description": "Last line is memorable, quotable, and values-led? Ends with confidence?"
+    },
+    {
+      "name": "Conciseness & Time-Fit",
+      "weight": 1.0,
+      "description": "Within word budget? Every sentence earns its place? No filler or repetition?"
+    },
+    {
+      "name": "Credibility & Safety",
+      "weight": 0.8,
+      "description": "No unsupported statistics or risky claims? Would not embarrass the contestant on stage?"
+    }
+  ],
+  "cap_rules": [
+    {
+      "if_dimension": "Directness & Clarity",
+      "below": 5,
+      "then_max_overall": 7
+    }
+  ],
+  "genericness_signals": [
+    "vague_call_to_action",
+    "no_personal_anchor",
+    "template_language",
+    "persona_not_referenced"
+  ]
+}

@@ -18,6 +18,10 @@ class RefinerState(TypedDict, total=False):
     question_id: str        # ID from question bank (for tracking/dedup)
     input_mode: str         # "text" or "voice" (for UI display)
 
+    # --- Persona context (set at graph invocation, optional) ---
+    persona_id: str             # ID of the active persona
+    persona_context: str        # Pre-formatted persona text block for prompts
+
     # --- Intermediate outputs (set by nodes) ---
     question_analysis: str  # From question understanding node
     draft_answer: str       # From drafting node
@@ -27,6 +31,11 @@ class RefinerState(TypedDict, total=False):
     refined_answer: str     # The polished on-stage answer
     coach_report: str       # Rubric scores + practice notes
     exemplar_answer: str    # Model winning answer for reference
+
+    # --- Structured scoring (M3) ---
+    critic_scores: dict     # Parsed CriticOutput as dict (from model_dump)
+    rubric_name: str        # Which rubric was used (e.g. "miss_universe")
+    exemplar_ref: dict      # Matched exemplar metadata (if any)
 
     # --- Control ---
     iteration_count: int    # Tracks critic->rewrite loops (max 2)

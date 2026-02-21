@@ -36,19 +36,23 @@ CONTEXT:
 - Time limit: {time_limit} seconds (~{word_budget} words)
 - Style: {style_description}
 
+{persona_context}
+
 CRITICAL: The very first sentence of the answer MUST directly answer the question. \
 No stories, no setup, no context before the answer. Answer first, then elaborate.
 
 ANSWER TEMPLATE (4-6 sentences, adapt to question type):
 1. Direct answer (1 sentence — the FIRST sentence, always. Never dodge or delay.)
 2. Meaning/value (1 sentence — why this matters)
-3. Personal anchor (1 sentence — a specific experience, not a generic claim)
+3. Personal anchor (1 sentence — draw from the contestant's real stories if provided, not a generic claim)
 4. Leadership/application (1 sentence — what you would do or stand for)
 5. Memorable close (1 sentence — a values-led line that sticks)
 
 RULES:
 - Stay within ~{word_budget} words.
 - Preserve the contestant's authentic voice and ideas from their raw answer.
+- If a contestant profile is provided, weave in their specific platform, values, \
+  and personal stories as the personal anchor. Do NOT invent experiences they did not share.
 - Do NOT add facts, statistics, or claims the contestant did not provide.
 - Avoid filler phrases: "I believe that", "As a woman", "In today's world".
 - The answer must sound spoken, not written.
@@ -59,32 +63,49 @@ STYLE INSTRUCTIONS:
 Write only the answer. No commentary."""
 
 # ---------------------------------------------------------------------------
-# Node 3: Critic (Scoring + Genericness Detection)
+# Node 3: Critic (Scoring + Genericness Detection) — M3: Structured JSON output
 # ---------------------------------------------------------------------------
 CRITIC_PROMPT = """\
 You are a tough but fair pageant Q&A judge and scoring critic. Evaluate the \
-draft answer against the Miss Universe rubric.
+draft answer against the rubric below.
 
 QUESTION: {question}
 DRAFT ANSWER: {draft_answer}
 TIME LIMIT: {time_limit} seconds (~{word_budget} words)
 
-Score each criterion 1-10 and give a one-line justification:
+{persona_context}
 
-1. **Clarity & Structure** — Is the answer direct and easy to follow?
-2. **Authenticity** — Does it sound real and personal, not templated?
-3. **Relevance** — Does it actually answer what was asked?
-4. **Leadership & Purpose** — Does it show vision or action, not just opinion?
-5. **Closing Impact** — Is the last line memorable and strong?
+{rubric_dimensions}
 
-Then provide:
-- **Overall score** (average of the 5 criteria)
-- **Genericness flag**: YES or NO — does this answer sound like it could come \
-  from any contestant? If YES, explain what's missing.
-- **Top 3 specific fixes** — concrete, actionable edits (not vague advice).
-- **Word count check** — is it within the ~{word_budget} word budget?
+{exemplar_structural_notes}
 
-Format your response exactly as structured above."""
+GENERICNESS SIGNALS to check for: vague_call_to_action, no_personal_anchor, \
+template_language, persona_not_referenced (if a contestant profile is provided \
+and the answer does not reference their specific stories, values, or platform).
+
+RISK SIGNALS to check for: unsupported_stat, risky_claim, controversial_framing.
+
+You MUST respond with valid JSON matching this exact structure (no markdown, no \
+commentary, just the JSON object):
+{{
+  "overall_score": <float 0-10>,
+  "dimension_scores": [
+    {{"name": "<dimension name>", "score": <float 0-10>, "reason": "<1 line>"}}
+  ],
+  "time_fit_estimate_words": <int>,
+  "top_fixes": [
+    {{"type": "<fix type>", "target": "<what part>", "instruction": "<concrete edit>"}}
+  ],
+  "genericness_flags": ["<signal>" or empty list],
+  "risk_flags": ["<signal>" or empty list]
+}}
+
+RULES:
+- Score each dimension independently. Be honest — 5 means average, 8+ means excellent.
+- The overall_score is the weighted average of dimension scores.
+- Count the actual words in the draft answer for time_fit_estimate_words.
+- Provide exactly 3 top_fixes — concrete, actionable edits (not vague advice).
+- Only include genericness_flags and risk_flags that actually apply. Empty list if none."""
 
 # ---------------------------------------------------------------------------
 # Node 4: Rewrite (applies critic edits + style)
@@ -97,6 +118,8 @@ QUESTION: {question}
 DRAFT ANSWER: {draft_answer}
 CRITIC FEEDBACK: {critique}
 TIME LIMIT: {time_limit} seconds (~{word_budget} words)
+
+{persona_context}
 
 STYLE INSTRUCTIONS:
 {style_instructions}
@@ -111,7 +134,8 @@ STRUCTURE (preserve this order):
 RULES:
 - The first sentence MUST directly answer the question. Never bury the answer.
 - Apply the critic's top fixes.
-- Keep the contestant's personal anchor intact — do not remove or genericize it.
+- Keep the contestant's personal anchor intact — if the contestant profile includes \
+  specific stories or experiences, these MUST be preserved, not genericized.
 - Tighten language: cut filler, sharpen verbs, strengthen the close.
 - Stay within ~{word_budget} words. If over, cut the weakest sentence.
 - The answer must sound spoken, not written. Read it aloud in your head.
@@ -130,10 +154,14 @@ ORIGINAL ANSWER: {raw_answer}
 REFINED ANSWER: {refined_answer}
 CRITIC SCORES: {critique}
 
+{structured_scores}
+
 Produce a report with these sections:
 
 ## Rubric Score
-Restate the 5 criterion scores and overall score from the critique.
+Present each scoring dimension with its score out of 10 and a one-line explanation. \
+If structured scores are provided above, use those exact scores. \
+Highlight the overall score prominently.
 
 ## What Changed
 3-4 bullet points explaining the key improvements made.
@@ -159,11 +187,16 @@ TIME LIMIT: {time_limit} seconds (~{word_budget} words)
 STYLE INSTRUCTIONS:
 {style_instructions}
 
+{exemplar_reference}
+
 GUIDELINES:
 - This is a reference exemplar, NOT the contestant's answer. Create a fresh, \
   original answer with a fictional but realistic personal anchor.
 - The very first sentence MUST directly answer the question.
 - Follow the analysis — address what the judges are really testing.
+- If structural notes from a real winning answer are provided above, use them \
+  as structural guidance (opening type, point count, close type) — but do NOT \
+  copy any wording from that answer.
 - Apply the answer template: direct answer, meaning, personal anchor, \
   leadership application, memorable close.
 - Use vivid, specific language — no filler phrases or generic platitudes.

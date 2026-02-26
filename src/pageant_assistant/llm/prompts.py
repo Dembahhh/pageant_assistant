@@ -3,6 +3,27 @@
 Each prompt is a string template that may include {variables} filled at runtime.
 """
 
+PROMPT_VERSION = "1.0"
+
+# ---------------------------------------------------------------------------
+# Shared answer structure (referenced in drafting, rewrite, and exemplar)
+# ---------------------------------------------------------------------------
+_ANSWER_TEMPLATE_FULL = """\
+ANSWER TEMPLATE (4-6 sentences, adapt to question type):
+1. Direct answer (1 sentence — the FIRST sentence, always. Never dodge or delay.)
+2. Meaning/value (1 sentence — why this matters)
+3. Personal anchor (1 sentence — draw from the contestant's real stories if provided, not a generic claim)
+4. Leadership/application (1 sentence — what you would do or stand for)
+5. Memorable close (1 sentence — a values-led line that sticks)"""
+
+_ANSWER_STRUCTURE_SHORT = """\
+STRUCTURE (preserve this order):
+1. Direct answer first (1 sentence — the very first sentence MUST answer the question)
+2. Meaning/value
+3. Personal anchor
+4. Leadership/application
+5. Memorable close"""
+
 # ---------------------------------------------------------------------------
 # Node 1: Question Understanding
 # ---------------------------------------------------------------------------
@@ -38,15 +59,11 @@ CONTEXT:
 
 {persona_context}
 
+{evidence_block}
 CRITICAL: The very first sentence of the answer MUST directly answer the question. \
 No stories, no setup, no context before the answer. Answer first, then elaborate.
 
-ANSWER TEMPLATE (4-6 sentences, adapt to question type):
-1. Direct answer (1 sentence — the FIRST sentence, always. Never dodge or delay.)
-2. Meaning/value (1 sentence — why this matters)
-3. Personal anchor (1 sentence — draw from the contestant's real stories if provided, not a generic claim)
-4. Leadership/application (1 sentence — what you would do or stand for)
-5. Memorable close (1 sentence — a values-led line that sticks)
+""" + _ANSWER_TEMPLATE_FULL + """
 
 RULES:
 - Stay within ~{word_budget} words.
@@ -56,6 +73,10 @@ RULES:
 - Do NOT add facts, statistics, or claims the contestant did not provide.
 - Avoid filler phrases: "I believe that", "As a woman", "In today's world".
 - The answer must sound spoken, not written.
+- EVIDENCE: If evidence is provided above, you MAY reference relevant facts or \
+  framings from it. Do NOT introduce any statistics, named organisations, or \
+  specific claims that are not in the provided evidence. If no evidence is \
+  provided, do NOT invent statistics, percentages, or named programmes.
 
 STYLE INSTRUCTIONS:
 {style_instructions}
@@ -121,15 +142,11 @@ TIME LIMIT: {time_limit} seconds (~{word_budget} words)
 
 {persona_context}
 
+{evidence_block}
 STYLE INSTRUCTIONS:
 {style_instructions}
 
-STRUCTURE (preserve this order):
-1. Direct answer first (1 sentence — the very first sentence MUST answer the question)
-2. Meaning/value
-3. Personal anchor
-4. Leadership/application
-5. Memorable close
+""" + _ANSWER_STRUCTURE_SHORT + """
 
 RULES:
 - The first sentence MUST directly answer the question. Never bury the answer.
@@ -139,11 +156,15 @@ RULES:
 - Tighten language: cut filler, sharpen verbs, strengthen the close.
 - Stay within ~{word_budget} words. If over, cut the weakest sentence.
 - The answer must sound spoken, not written. Read it aloud in your head.
+- EVIDENCE: If evidence is provided above, you MAY incorporate relevant facts. \
+  Do NOT introduce statistics, named organisations, or claims not in the evidence.
 
 Write only the refined answer. No commentary."""
 
 # ---------------------------------------------------------------------------
 # Coach Report (final formatting node)
+# NOTE: The ## section headings below are rendered by st.markdown() in the
+# Streamlit UI. Renaming them will change the visible layout.
 # ---------------------------------------------------------------------------
 COACH_REPORT_PROMPT = """\
 You are a pageant coaching analyst. Produce a concise coach report comparing \

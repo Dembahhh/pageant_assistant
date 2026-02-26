@@ -1,8 +1,8 @@
 """Question bank: load, filter, and randomly select pageant questions."""
 
+import functools
 import json
 import random
-from pathlib import Path
 from typing import Optional
 
 from pageant_assistant.config.settings import QUESTIONS_DIR
@@ -10,11 +10,12 @@ from pageant_assistant.config.settings import QUESTIONS_DIR
 QUESTIONS_FILE = QUESTIONS_DIR / "question_bank.json"
 
 
-def load_questions() -> list[dict]:
-    """Load the full question bank from JSON."""
+@functools.lru_cache(maxsize=1)
+def load_questions() -> tuple[dict, ...]:
+    """Load the full question bank from JSON (cached for process lifetime)."""
     with open(QUESTIONS_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
-    return data["questions"]
+    return tuple(data["questions"])
 
 
 def get_random_question(
@@ -48,6 +49,8 @@ def get_random_question(
     # Fallback: if all questions exhausted or filters too narrow, reset
     if not questions:
         questions = load_questions()
+        if not questions:
+            raise RuntimeError("Question bank is empty or could not be loaded.")
 
     return random.choice(questions)
 

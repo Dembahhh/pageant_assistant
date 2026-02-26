@@ -7,3 +7,5 @@ build/
 data/chroma/
 .venv/
 venv/
+docs/
+.agent/

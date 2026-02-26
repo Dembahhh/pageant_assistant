@@ -1,8 +1,13 @@
+import logging
+
+import groq
 import streamlit as st
 from dotenv import load_dotenv
 
 # Load env before any pageant_assistant imports
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 from pageant_assistant.graphs.refiner import build_refiner_graph
 from pageant_assistant.questions.bank import get_random_question, get_filter_options
@@ -207,6 +212,28 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# --- Seed evidence store once per server session ---
+@st.cache_resource(show_spinner=False)
+def _seed_evidence_store() -> int:
+    """Seed the Chroma evidence store with Kenya/Africa corpus on first run.
+
+    Wrapped in cache_resource so it executes only once per Streamlit server
+    session, not on every page rerun.
+
+    Returns:
+        Number of chunks in the collection after seeding.
+    """
+    try:
+        from pageant_assistant.rag.seed import seed_if_empty
+        n = seed_if_empty()
+        logger.info("Evidence store ready — %d chunk(s)", n)
+        return n
+    except Exception as exc:
+        logger.warning("Evidence store seeding failed: %s", exc)
+        return 0
+
+_seed_evidence_store()
+
 # --- Check API key ---
 if not GROQ_API_KEY:
     st.error(
@@ -226,25 +253,24 @@ with st.sidebar:
     )
 
     profiles = list_personas()
-    profile_options = ["(No profile selected)"] + [
-        f"{p['name']} ({p['country']})" for p in profiles
-    ]
-    profile_ids = [None] + [p["id"] for p in profiles]
+    persona_map: dict = {None: "(No profile selected)"}
+    persona_map.update(
+        {p["id"]: f"{p['name']} ({p['country']})" for p in profiles}
+    )
+    persona_ids = list(persona_map.keys())
 
     current_idx = 0
-    if st.session_state.active_persona_id in profile_ids:
-        current_idx = profile_ids.index(st.session_state.active_persona_id)
+    if st.session_state.active_persona_id in persona_ids:
+        current_idx = persona_ids.index(st.session_state.active_persona_id)
 
-    selected_idx = st.selectbox(
+    selected_persona_id = st.selectbox(
         "Active profile",
-        options=range(len(profile_options)),
+        options=persona_ids,
         index=current_idx,
-        format_func=lambda i: profile_options[i],
+        format_func=lambda pid: persona_map.get(pid, "(Unknown)"),
         key="persona_selector",
         label_visibility="collapsed",
     )
-
-    selected_persona_id = profile_ids[selected_idx]
     if selected_persona_id != st.session_state.active_persona_id:
         st.session_state.active_persona_id = selected_persona_id
         if selected_persona_id:
@@ -304,7 +330,7 @@ with st.sidebar:
         f"<div style='font-family: Inter, sans-serif; font-size: 0.75rem; "
         f"color: #6b6b7b; line-height: 1.8;'>"
         f"Target: ~{word_budget} words / {time_limit}s<br>"
-        f"Pipeline: Analyze &rarr; Draft &rarr; Critique &rarr; Rewrite &rarr; Exemplar"
+        f"Pipeline: Analyze &rarr; Research &rarr; Draft &rarr; Critique &rarr; Rewrite &rarr; Verify &rarr; Report"
         f"</div>",
         unsafe_allow_html=True,
     )
@@ -328,6 +354,7 @@ with col_input:
         # Clear previous results
         st.session_state.tts_audio = None
         st.session_state.transcribed_text = ""
+        st.session_state.audio_transcribed = False
         st.session_state.result = None
 
     # --- Display current question ---
@@ -373,11 +400,12 @@ with col_input:
         )
     else:
         audio_input = st.audio_input("Speak your answer")
-        if audio_input:
+        if audio_input and not st.session_state.get("audio_transcribed"):
             with st.spinner("Transcribing..."):
                 st.session_state.transcribed_text = transcribe_audio(
                     audio_input.getvalue()
                 )
+                st.session_state.audio_transcribed = True
         if st.session_state.transcribed_text:
             raw_answer = st.text_area(
                 "Edit transcript",
@@ -402,9 +430,19 @@ with col_output:
         elif not raw_answer.strip():
             st.warning("Please provide your answer — type it or speak it.")
         else:
+            _NODE_LABELS = {
+                "question_understanding": "Analyzing the question...",
+                "rag_research": "Retrieving evidence...",
+                "drafting": "Drafting your answer...",
+                "critic": "Scoring against rubric...",
+                "rewrite": "Polishing the answer...",
+                "claim_verifier": "Verifying factual claims...",
+                "coach_report": "Writing coach report...",
+                "generate_exemplar": "Creating winning example...",
+            }
+
             with st.status("The judges are deliberating...", expanded=True) as status:
                 try:
-                    status.write("Analyzing the question...")
                     graph = build_refiner_graph()
 
                     persona_ctx = ""
@@ -413,7 +451,7 @@ with col_output:
                             st.session_state.active_persona
                         )
 
-                    result = graph.invoke({
+                    input_state = {
                         "question": st.session_state.current_question["text"],
                         "raw_answer": raw_answer,
                         "time_limit": time_limit,
@@ -423,20 +461,34 @@ with col_output:
                         "iteration_count": 0,
                         "persona_id": st.session_state.active_persona_id or "",
                         "persona_context": persona_ctx,
-                    })
+                    }
 
-                    st.session_state.result = result
+                    # Stream node-by-node for live progress updates
+                    accumulated = dict(input_state)
+                    for chunk in graph.stream(input_state):
+                        for node_name, node_output in chunk.items():
+                            accumulated.update(node_output)
+                            label = _NODE_LABELS.get(node_name)
+                            if label:
+                                status.write(label)
+
+                    st.session_state.result = accumulated
                     status.update(
                         label="Coaching complete", state="complete", expanded=False
                     )
 
+                except groq.AuthenticationError:
+                    status.update(label="Authentication failed", state="error")
+                    st.error("Authentication failed. Check your GROQ_API_KEY in .env.")
+                except groq.RateLimitError:
+                    status.update(label="Rate limited", state="error")
+                    st.error("Groq rate limit reached. Wait a moment and try again.")
+                except groq.APIConnectionError:
+                    status.update(label="Connection failed", state="error")
+                    st.error("Could not connect to Groq. Check your internet connection.")
                 except Exception as e:
                     status.update(label="An error occurred", state="error")
-                    error_msg = str(e)
-                    if "api_key" in error_msg.lower() or "auth" in error_msg.lower():
-                        st.error("Authentication failed. Check your GROQ_API_KEY in .env.")
-                    else:
-                        st.error(f"Error: {error_msg}")
+                    st.error(f"Error: {e}")
 
     # --- Display results (outside st.status so they're always visible) ---
     if st.session_state.result:
@@ -536,6 +588,20 @@ with col_output:
                         st.markdown(
                             f"- **{fix.get('target', '')}**: {fix.get('instruction', '')}",
                         )
+
+                # Claim verification flags (M4)
+                claim_flags = result.get("claim_flags") or []
+                if claim_flags:
+                    st.markdown(
+                        '<div class="section-label" style="margin-top: 1rem;">'
+                        'Fact-Check Warnings</div>',
+                        unsafe_allow_html=True,
+                    )
+                    flags_md = "\n".join(f"- {flag}" for flag in claim_flags)
+                    st.warning(
+                        "These claims were not found in the retrieved evidence. "
+                        "Verify before using on stage:\n\n" + flags_md
+                    )
 
                 st.divider()
 

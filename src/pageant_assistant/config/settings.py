@@ -2,8 +2,18 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env from project root (PAGEANT_ASSISTANT/)
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+
+def _find_project_root() -> Path:
+    """Walk up from this file until pyproject.toml is found."""
+    for parent in Path(__file__).resolve().parents:
+        if (parent / "pyproject.toml").exists():
+            return parent
+    raise FileNotFoundError(
+        "Could not locate project root (no pyproject.toml found above settings.py)"
+    )
+
+
+PROJECT_ROOT = _find_project_root()
 load_dotenv(PROJECT_ROOT / ".env")
 
 # --- LLM Configuration ---
@@ -42,8 +52,15 @@ QUESTIONS_DIR = DATA_DIR / "questions"
 PERSONAS_DIR = DATA_DIR / "personas"
 EXEMPLARS_DIR = DATA_DIR / "exemplars"
 
+# Ensure required data directories exist on import
+for _d in (DATA_DIR, CHROMA_DIR, QUESTIONS_DIR, PERSONAS_DIR, EXEMPLARS_DIR):
+    _d.mkdir(parents=True, exist_ok=True)
+
 # --- Rubric ---
 DEFAULT_RUBRIC = "miss_universe"
+
+# --- RAG ---
+RAG_COLLECTION_NAME = "pageant_evidence"
 
 # --- Voice Configuration ---
 STT_MODEL = "whisper-large-v3-turbo"

@@ -1,4 +1,24 @@
-from typing import TypedDict
+from typing import Any, TypedDict
+
+
+class CriticScoresState(TypedDict, total=False):
+    """Mirrors CriticOutput.model_dump() shape for static checking."""
+
+    overall_score: float
+    dimension_scores: list[dict[str, Any]]
+    time_fit_estimate_words: int
+    top_fixes: list[dict[str, str]]
+    genericness_flags: list[str]
+    risk_flags: list[str]
+    exemplar_reference: dict[str, Any] | None
+
+
+class ExemplarRefState(TypedDict, total=False):
+    """Mirrors ExemplarReference.model_dump() shape."""
+
+    match_type: str
+    exemplar_id: str
+    structural_takeaways: list[str]
 
 
 class RefinerState(TypedDict, total=False):
@@ -33,9 +53,14 @@ class RefinerState(TypedDict, total=False):
     exemplar_answer: str    # Model winning answer for reference
 
     # --- Structured scoring (M3) ---
-    critic_scores: dict     # Parsed CriticOutput as dict (from model_dump)
+    critic_scores: CriticScoresState  # Parsed CriticOutput as dict (from model_dump)
     rubric_name: str        # Which rubric was used (e.g. "miss_universe")
-    exemplar_ref: dict      # Matched exemplar metadata (if any)
+    exemplar_ref: ExemplarRefState  # Matched exemplar metadata (if any)
+
+    # --- RAG evidence (M4) ---
+    rag_evidence: str       # Formatted evidence block injected into prompts (None = not retrieved)
+    rag_question_type: str  # Question type inferred by rag_research (e.g. "advocacy")
+    claim_flags: list[str]  # Unsupported factual claims flagged by claim_verifier
 
     # --- Control ---
     iteration_count: int    # Tracks critic->rewrite loops (max 2)

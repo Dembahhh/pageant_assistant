@@ -1,0 +1,40 @@
+# Version control
+.git
+.gitignore
+
+# Secrets (must be injected at runtime via -e or --env-file)
+.env
+.env.*
+!.env.example
+
+# Python dev artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+
+# Runtime-generated data (not baked into image)
+data/chroma/
+data/personas/
+
+# Development / documentation
+docs/
+tests/
+old_reference/
+.agent/
+.vscode/
+.qodo/
+
+# Database files
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db

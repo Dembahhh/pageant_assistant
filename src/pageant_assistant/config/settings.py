@@ -18,6 +18,13 @@ load_dotenv(PROJECT_ROOT / ".env")
 
 # --- LLM Configuration ---
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+if not GROQ_API_KEY:
+    # Fallback to Streamlit Community Cloud secrets management
+    try:
+        import streamlit as st
+        GROQ_API_KEY = st.secrets.get("GROQ_API_KEY")
+    except Exception:
+        pass
 GROQ_MODEL = "llama-3.3-70b-versatile"
 
 # Temperature defaults per agent role

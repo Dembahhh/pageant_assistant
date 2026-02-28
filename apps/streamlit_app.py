@@ -200,7 +200,6 @@ st.markdown(
         border: 1px solid #252535 !important;
     }
 
-    [data-testid="stSidebarNav"] ul {display: none;}
     #MainMenu, footer, header {visibility: hidden;}
 </style>
 """,
@@ -286,10 +285,7 @@ with st.sidebar:
             st.session_state.active_persona = None
         st.session_state.result = None
 
-    try:
-        st.page_link("pages/1_My_Profile.py", label="Edit My Profile", use_container_width=True)
-    except Exception:
-        pass
+    st.page_link("pages/1_My_Profile.py", label="Edit My Profile", use_container_width=True)
 
     if not profiles:
         st.caption("Head over to **My Profile** to set up your contestant profile.")
@@ -409,7 +405,12 @@ with col_input:
         audio_input = st.audio_input("Speak your answer")
         if audio_input and not st.session_state.get("audio_transcribed"):
             with st.spinner("Transcribing..."):
-                st.session_state.transcribed_text = transcribe_audio(audio_input.getvalue())
+                # Pass audio_input.name so Groq receives the correct file extension
+                # (browsers record WebM, not WAV — the extension drives format parsing)
+                st.session_state.transcribed_text = transcribe_audio(
+                    audio_input.getvalue(),
+                    filename=audio_input.name,
+                )
                 st.session_state.audio_transcribed = True
         if st.session_state.transcribed_text:
             raw_answer = st.text_area(

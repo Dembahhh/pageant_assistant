@@ -70,7 +70,6 @@ SEED_CORPUS: list[dict[str, Any]] = [
             "region": "Kenya/Africa",
         },
     },
-
     # ── 2. GENDER EQUALITY ──────────────────────────────────────────────────
     {
         "id": "ge-framing-ke",
@@ -124,7 +123,6 @@ SEED_CORPUS: list[dict[str, Any]] = [
             "region": "Kenya/Africa",
         },
     },
-
     # ── 3. SOCIAL MEDIA & DIGITAL ───────────────────────────────────────────
     {
         "id": "sm-framing-ke",
@@ -179,7 +177,6 @@ SEED_CORPUS: list[dict[str, Any]] = [
             "region": "Kenya",
         },
     },
-
     # ── 4. EDUCATION ACCESS ─────────────────────────────────────────────────
     {
         "id": "ed-framing-ke",
@@ -234,7 +231,6 @@ SEED_CORPUS: list[dict[str, Any]] = [
             "region": "Kenya",
         },
     },
-
     # ── 5. WOMEN'S LEADERSHIP ───────────────────────────────────────────────
     {
         "id": "ld-framing-ke",
@@ -289,7 +285,6 @@ SEED_CORPUS: list[dict[str, Any]] = [
             "region": "Kenya/Africa",
         },
     },
-
     # ── 6. CLIMATE & ENVIRONMENT ────────────────────────────────────────────
     {
         "id": "cl-framing-ke",
@@ -363,26 +358,22 @@ def seed_if_empty() -> int:
         >>> n >= 18
         True
     """
-    from pageant_assistant.rag.store import collection_size, add_chunks  # local import avoids circular deps
+    from pageant_assistant.rag.store import (  # local import avoids circular deps
+        add_chunks,
+        collection_size,
+    )
 
     size = collection_size()
     if size > 0:
-        logger.info(
-            "seed_if_empty: collection already has %d chunk(s) — skipping", size
-        )
+        logger.info("seed_if_empty: collection already has %d chunk(s) — skipping", size)
         return size
 
     logger.info(
         "seed_if_empty: collection empty — seeding %d Kenya/Africa chunks …",
         len(SEED_CORPUS),
     )
-    chunks = [
-        {"id": c["id"], "text": c["text"], "metadata": c["metadata"]}
-        for c in SEED_CORPUS
-    ]
+    chunks = [{"id": c["id"], "text": c["text"], "metadata": c["metadata"]} for c in SEED_CORPUS]
     add_chunks(chunks)
     final_size = collection_size()
-    logger.info(
-        "seed_if_empty: seeding complete — %d chunk(s) now in collection", final_size
-    )
+    logger.info("seed_if_empty: seeding complete — %d chunk(s) now in collection", final_size)
     return final_size

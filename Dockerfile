@@ -9,18 +9,14 @@ WORKDIR /build
 # Install pinned build tools
 RUN pip install --no-cache-dir setuptools==75.8.2 wheel==0.45.1
 
-# Copy lockfile first (layer caching: only re-installs if deps change)
-COPY requirements.lock .
-
-# Copy package source for installation
+# Copy package manifest first (layer caching: only re-installs if deps change)
 COPY pyproject.toml .
 COPY src/ src/
 
-# Create venv and install with hash verification for supply chain safety
-# The lockfile was generated with: pip-compile pyproject.toml --generate-hashes -o requirements.lock
+# Create venv and install the package with all dependencies
 RUN python -m venv /build/venv && \
-    /build/venv/bin/pip install --no-cache-dir --require-hashes -r requirements.lock && \
-    /build/venv/bin/pip install --no-cache-dir --no-deps .
+    /build/venv/bin/pip install --no-cache-dir --upgrade pip && \
+    /build/venv/bin/pip install --no-cache-dir .
 
 # Pre-warm the ChromaDB ONNX embedding model (~79MB)
 # Downloads all-MiniLM-L6-v2 to ~/.cache/chroma/ at build time

@@ -1,7 +1,6 @@
 """Exemplar library: load and search real winning answers for structural reference."""
 
 import json
-from typing import Optional
 
 from pageant_assistant.config.settings import EXEMPLARS_DIR
 
@@ -21,9 +20,9 @@ def load_exemplars() -> list[dict]:
 
 def find_exemplar(
     question_type: str,
-    theme_tags: Optional[list[str]] = None,
+    theme_tags: list[str] | None = None,
     pageant: str = "Miss Universe",
-) -> Optional[dict]:
+) -> dict | None:
     """Find the closest matching exemplar by question type and theme overlap.
 
     Matching priority:
@@ -62,7 +61,7 @@ def find_exemplar(
     return candidates[0] if candidates else None
 
 
-def format_exemplar_reference(exemplar: Optional[dict]) -> str:
+def format_exemplar_reference(exemplar: dict | None) -> str:
     """Format exemplar structural notes for prompt injection.
 
     Only injects structural takeaways — never the actual answer text.

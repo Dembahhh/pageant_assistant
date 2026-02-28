@@ -93,9 +93,7 @@ def retrieve_evidence(query: str, n_results: int = 6) -> list[dict[str, Any]]:
             logger.debug("retrieve_evidence: collection empty — skipping query")
             return []
         actual_n = min(n_results, count)
-        logger.debug(
-            "retrieve_evidence: querying top-%d for %r …", actual_n, query[:80]
-        )
+        logger.debug("retrieve_evidence: querying top-%d for %r …", actual_n, query[:80])
         results = col.query(
             query_texts=[query],
             n_results=actual_n,

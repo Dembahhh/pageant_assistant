@@ -7,14 +7,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from pydantic import ValidationError
+
 from pageant_assistant.personas.manager import (
+    delete_persona,
     list_personas,
     load_persona,
     save_persona,
-    delete_persona,
 )
 from pageant_assistant.personas.models import Persona, PersonalStory
-from pydantic import ValidationError
 
 st.set_page_config(
     page_title="My Profile — Pageant AI Coach",
@@ -23,7 +24,8 @@ st.set_page_config(
 )
 
 # --- CSS (shared theme) ---
-st.markdown("""
+st.markdown(
+    """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
@@ -129,19 +131,24 @@ st.markdown("""
     [data-testid="stSidebarNav"] ul {display: none;}
     #MainMenu, footer, header {visibility: hidden;}
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # --- Session state ---
 if "editing_persona_id" not in st.session_state:
     st.session_state.editing_persona_id = None
 
 # --- Header ---
-st.markdown("""
+st.markdown(
+    """
 <div class="page-header">
     <h1>My Profile</h1>
     <p>Tell us about yourself so your answers feel like you</p>
 </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # --- Layout ---
 col_list, col_spacer, col_editor = st.columns([0.8, 0.05, 1.2])
@@ -174,9 +181,9 @@ with col_list:
             with col_card:
                 st.markdown(
                     f'<div class="profile-card">'
-                    f'<h3>{p["name"]}</h3>'
+                    f"<h3>{p['name']}</h3>"
                     f'<div class="meta">{p["country"]}</div>'
-                    f'</div>',
+                    f"</div>",
                     unsafe_allow_html=True,
                 )
             with col_actions:
@@ -209,8 +216,12 @@ with col_editor:
         )
     else:
         is_new = st.session_state.editing_persona_id == "__new__"
-        persona = None if is_new else load_persona(
-            st.session_state.editing_persona_id,
+        persona = (
+            None
+            if is_new
+            else load_persona(
+                st.session_state.editing_persona_id,
+            )
         )
 
         if not is_new and persona is None:
@@ -220,10 +231,12 @@ with col_editor:
             )
 
         p_name = st.text_input(
-            "Your name", value=persona.name if persona else "",
+            "Your name",
+            value=persona.name if persona else "",
         )
         p_country = st.text_input(
-            "Country you represent", value=persona.country if persona else "",
+            "Country you represent",
+            value=persona.country if persona else "",
         )
         p_platform = st.text_input(
             "Your platform / advocacy",
@@ -306,9 +319,7 @@ with col_editor:
         with col_save:
             if st.button("Save Profile", use_container_width=True):
                 if p_name and p_country and p_platform and p_values_str:
-                    values = [
-                        v.strip() for v in p_values_str.split(",") if v.strip()
-                    ]
+                    values = [v.strip() for v in p_values_str.split(",") if v.strip()]
                     try:
                         new_persona = Persona(
                             id=persona.id if persona else uuid.uuid4().hex[:12],

@@ -7,24 +7,24 @@ from dotenv import load_dotenv
 # Load env before any pageant_assistant imports
 load_dotenv()
 
-logger = logging.getLogger(__name__)
-
-from pageant_assistant.graphs.refiner import build_refiner_graph
-from pageant_assistant.questions.bank import get_random_question, get_filter_options
-from pageant_assistant.voice.audio import transcribe_audio, synthesize_speech
-from pageant_assistant.personas.manager import (
-    list_personas,
-    load_persona,
-    format_persona_context,
-)
 from pageant_assistant.config.settings import (
+    DEFAULT_STYLE,
+    DEFAULT_TIME_LIMIT,
     GROQ_API_KEY,
     STYLE_PRESETS,
-    DEFAULT_STYLE,
     VALID_TIME_LIMITS,
-    DEFAULT_TIME_LIMIT,
     WORDS_PER_SECOND,
 )
+from pageant_assistant.graphs.refiner import build_refiner_graph
+from pageant_assistant.personas.manager import (
+    format_persona_context,
+    list_personas,
+    load_persona,
+)
+from pageant_assistant.questions.bank import get_filter_options, get_random_question
+from pageant_assistant.voice.audio import synthesize_speech, transcribe_audio
+
+logger = logging.getLogger(__name__)
 
 st.set_page_config(
     page_title="Pageant AI Coach",
@@ -49,7 +49,8 @@ if "active_persona" not in st.session_state:
     st.session_state.active_persona = None
 
 # --- CSS ---
-st.markdown("""
+st.markdown(
+    """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
@@ -202,15 +203,21 @@ st.markdown("""
     [data-testid="stSidebarNav"] ul {display: none;}
     #MainMenu, footer, header {visibility: hidden;}
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # --- Header ---
-st.markdown("""
+st.markdown(
+    """
 <div class="app-header">
     <h1>Pageant AI Coach</h1>
     <p>Refine &middot; Rehearse &middot; Reign</p>
 </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
+
 
 # --- Seed evidence store once per server session ---
 @st.cache_resource(show_spinner=False)
@@ -225,12 +232,14 @@ def _seed_evidence_store() -> int:
     """
     try:
         from pageant_assistant.rag.seed import seed_if_empty
+
         n = seed_if_empty()
         logger.info("Evidence store ready — %d chunk(s)", n)
         return n
     except Exception as exc:
         logger.warning("Evidence store seeding failed: %s", exc)
         return 0
+
 
 _seed_evidence_store()
 
@@ -254,9 +263,7 @@ with st.sidebar:
 
     profiles = list_personas()
     persona_map: dict = {None: "(No profile selected)"}
-    persona_map.update(
-        {p["id"]: f"{p['name']} ({p['country']})" for p in profiles}
-    )
+    persona_map.update({p["id"]: f"{p['name']} ({p['country']})" for p in profiles})
     persona_ids = list(persona_map.keys())
 
     current_idx = 0
@@ -364,10 +371,10 @@ with col_input:
             f'<div class="question-card">'
             f'"{q["text"]}"'
             f'<div class="question-meta">'
-            f'{q["pageant_type"].replace("_", " ").title()} &middot; '
-            f'{q["question_type"].replace("_", " ").title()} &middot; '
-            f'{q["difficulty"].title()}'
-            f'</div></div>',
+            f"{q['pageant_type'].replace('_', ' ').title()} &middot; "
+            f"{q['question_type'].replace('_', ' ').title()} &middot; "
+            f"{q['difficulty'].title()}"
+            f"</div></div>",
             unsafe_allow_html=True,
         )
     else:
@@ -402,9 +409,7 @@ with col_input:
         audio_input = st.audio_input("Speak your answer")
         if audio_input and not st.session_state.get("audio_transcribed"):
             with st.spinner("Transcribing..."):
-                st.session_state.transcribed_text = transcribe_audio(
-                    audio_input.getvalue()
-                )
+                st.session_state.transcribed_text = transcribe_audio(audio_input.getvalue())
                 st.session_state.audio_transcribed = True
         if st.session_state.transcribed_text:
             raw_answer = st.text_area(
@@ -419,9 +424,7 @@ with col_input:
     run_btn = st.button("Polish My Answer")
 
 with col_output:
-    st.markdown(
-        '<div class="section-label">Coaching Feedback</div>', unsafe_allow_html=True
-    )
+    st.markdown('<div class="section-label">Coaching Feedback</div>', unsafe_allow_html=True)
 
     # --- Run pipeline ---
     if run_btn:
@@ -447,9 +450,7 @@ with col_output:
 
                     persona_ctx = ""
                     if st.session_state.active_persona:
-                        persona_ctx = format_persona_context(
-                            st.session_state.active_persona
-                        )
+                        persona_ctx = format_persona_context(st.session_state.active_persona)
 
                     input_state = {
                         "question": st.session_state.current_question["text"],
@@ -473,9 +474,7 @@ with col_output:
                                 status.write(label)
 
                     st.session_state.result = accumulated
-                    status.update(
-                        label="Coaching complete", state="complete", expanded=False
-                    )
+                    status.update(label="Coaching complete", state="complete", expanded=False)
 
                 except groq.AuthenticationError:
                     status.update(label="Authentication failed", state="error")
@@ -508,9 +507,7 @@ with col_output:
             if not st.session_state.tts_audio:
                 st.write("")
                 with st.spinner("Preparing audio..."):
-                    st.session_state.tts_audio = synthesize_speech(
-                        result.get("refined_answer", "")
-                    )
+                    st.session_state.tts_audio = synthesize_speech(result.get("refined_answer", ""))
 
             if st.session_state.tts_audio:
                 st.markdown(
@@ -572,7 +569,9 @@ with col_output:
                     )
 
                 # Genericness / risk flags
-                flags = critic_scores.get("genericness_flags", []) + critic_scores.get("risk_flags", [])
+                flags = critic_scores.get("genericness_flags", []) + critic_scores.get(
+                    "risk_flags", []
+                )
                 if flags:
                     flag_text = ", ".join(f.replace("_", " ") for f in flags)
                     st.warning(f"Flags: {flag_text}")
@@ -594,7 +593,7 @@ with col_output:
                 if claim_flags:
                     st.markdown(
                         '<div class="section-label" style="margin-top: 1rem;">'
-                        'Fact-Check Warnings</div>',
+                        "Fact-Check Warnings</div>",
                         unsafe_allow_html=True,
                     )
                     flags_md = "\n".join(f"- {flag}" for flag in claim_flags)

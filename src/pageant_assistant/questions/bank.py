@@ -3,7 +3,6 @@
 import functools
 import json
 import random
-from typing import Optional
 
 from pageant_assistant.config.settings import QUESTIONS_DIR
 
@@ -13,16 +12,16 @@ QUESTIONS_FILE = QUESTIONS_DIR / "question_bank.json"
 @functools.lru_cache(maxsize=1)
 def load_questions() -> tuple[dict, ...]:
     """Load the full question bank from JSON (cached for process lifetime)."""
-    with open(QUESTIONS_FILE, "r", encoding="utf-8") as f:
+    with open(QUESTIONS_FILE, encoding="utf-8") as f:
         data = json.load(f)
     return tuple(data["questions"])
 
 
 def get_random_question(
-    pageant_type: Optional[str] = None,
-    question_type: Optional[str] = None,
-    difficulty: Optional[str] = None,
-    exclude_ids: Optional[set[str]] = None,
+    pageant_type: str | None = None,
+    question_type: str | None = None,
+    difficulty: str | None = None,
+    exclude_ids: set[str] | None = None,
 ) -> dict:
     """Return one random question, optionally filtered.
 

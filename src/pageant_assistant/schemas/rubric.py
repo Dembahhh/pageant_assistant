@@ -14,15 +14,15 @@ class DimensionScore(BaseModel):
 class CriticFix(BaseModel):
     """A concrete, actionable fix suggested by the critic."""
 
-    type: str       # e.g. "rewrite_sentence", "add_anchor", "strengthen_close"
-    target: str     # which dimension or part of the answer this addresses
+    type: str  # e.g. "rewrite_sentence", "add_anchor", "strengthen_close"
+    target: str  # which dimension or part of the answer this addresses
     instruction: str
 
 
 class ExemplarReference(BaseModel):
     """Reference to a matched exemplar from the library."""
 
-    match_type: str = "none"       # "exact", "closest_match", "none"
+    match_type: str = "none"  # "exact", "closest_match", "none"
     exemplar_id: str = ""
     structural_takeaways: list[str] = Field(default_factory=list)
 

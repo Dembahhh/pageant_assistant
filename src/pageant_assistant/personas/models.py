@@ -1,6 +1,7 @@
 """Pydantic models for contestant personas."""
 
 import uuid
+
 from pydantic import BaseModel, Field
 
 
@@ -8,15 +9,19 @@ class PersonalStory(BaseModel):
     """A single personal story/experience the contestant can draw from."""
 
     title: str = Field(
-        ..., min_length=1, max_length=120,
+        ...,
+        min_length=1,
+        max_length=120,
         description="Short label, e.g. 'Teaching in Rural Zambia'",
     )
     text: str = Field(
-        ..., min_length=10,
+        ...,
+        min_length=10,
         description="The story in 2-4 sentences",
     )
     key_lesson: str = Field(
-        ..., min_length=5,
+        ...,
+        min_length=5,
         description="One-sentence takeaway the contestant learned",
     )
 
@@ -29,15 +34,20 @@ class Persona(BaseModel):
         description="Unique persona identifier",
     )
     name: str = Field(
-        ..., min_length=1, max_length=100,
+        ...,
+        min_length=1,
+        max_length=100,
         description="Contestant's name",
     )
     country: str = Field(
-        ..., min_length=1, max_length=100,
+        ...,
+        min_length=1,
+        max_length=100,
         description="Country of representation",
     )
     platform: str = Field(
-        ..., min_length=1,
+        ...,
+        min_length=1,
         description="Advocacy platform, e.g. 'Mental health for youth'",
     )
     values: list[str] = Field(

@@ -1,12 +1,13 @@
 """Voice I/O: speech-to-text (Groq Whisper) and text-to-speech (Groq PlayAI)."""
 
 from groq import Groq
+
 from pageant_assistant.config.settings import (
     GROQ_API_KEY,
     STT_MODEL,
     TTS_MODEL,
-    TTS_VOICE,
     TTS_RESPONSE_FORMAT,
+    TTS_VOICE,
 )
 
 

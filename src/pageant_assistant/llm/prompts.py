@@ -46,7 +46,8 @@ Be concise — this analysis is for internal use, not the audience."""
 # ---------------------------------------------------------------------------
 # Node 2: Drafting
 # ---------------------------------------------------------------------------
-DRAFTING_PROMPT = """\
+DRAFTING_PROMPT = (
+    """\
 You are a world-class pageant speech coach. Generate a strong first draft \
 answer for the contestant.
 
@@ -63,7 +64,9 @@ CONTEXT:
 CRITICAL: The very first sentence of the answer MUST directly answer the question. \
 No stories, no setup, no context before the answer. Answer first, then elaborate.
 
-""" + _ANSWER_TEMPLATE_FULL + """
+"""
+    + _ANSWER_TEMPLATE_FULL
+    + """
 
 RULES:
 - Stay within ~{word_budget} words.
@@ -82,6 +85,7 @@ STYLE INSTRUCTIONS:
 {style_instructions}
 
 Write only the answer. No commentary."""
+)
 
 # ---------------------------------------------------------------------------
 # Node 3: Critic (Scoring + Genericness Detection) — M3: Structured JSON output
@@ -131,7 +135,8 @@ RULES:
 # ---------------------------------------------------------------------------
 # Node 4: Rewrite (applies critic edits + style)
 # ---------------------------------------------------------------------------
-REWRITE_PROMPT = """\
+REWRITE_PROMPT = (
+    """\
 You are the final polish pass. Take the draft answer and the critic's feedback, \
 and produce a refined answer ready for the stage.
 
@@ -146,7 +151,9 @@ TIME LIMIT: {time_limit} seconds (~{word_budget} words)
 STYLE INSTRUCTIONS:
 {style_instructions}
 
-""" + _ANSWER_STRUCTURE_SHORT + """
+"""
+    + _ANSWER_STRUCTURE_SHORT
+    + """
 
 RULES:
 - The first sentence MUST directly answer the question. Never bury the answer.
@@ -160,6 +167,7 @@ RULES:
   Do NOT introduce statistics, named organisations, or claims not in the evidence.
 
 Write only the refined answer. No commentary."""
+)
 
 # ---------------------------------------------------------------------------
 # Coach Report (final formatting node)
@@ -238,7 +246,6 @@ Style: Structured Narrative
 - Apply it to leadership (as a titleholder, what would you do).
 - Close with a vivid, hopeful vision — a line worth quoting.
 - Sentence rhythm: medium-length, steady pacing, purposeful.""",
-
     "values_shared_agency": """\
 Style: Values + Shared Agency
 - Lead with a clear stance (with measured nuance, not extremes).

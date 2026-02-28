@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 
@@ -22,6 +23,7 @@ if not GROQ_API_KEY:
     # Fallback to Streamlit Community Cloud secrets management
     try:
         import streamlit as st
+
         GROQ_API_KEY = st.secrets.get("GROQ_API_KEY")
     except Exception:
         pass
@@ -29,12 +31,12 @@ GROQ_MODEL = "llama-3.3-70b-versatile"
 
 # Temperature defaults per agent role
 TEMPERATURE = {
-    "supervisor": 0.0,       # Deterministic routing decisions
-    "question_analysis": 0.2, # Precise classification
-    "drafting": 0.7,          # Creative but focused
-    "critic": 0.1,            # Consistent scoring
-    "rewrite": 0.6,           # Creative within constraints
-    "exemplar": 0.75,         # Slightly higher creativity for showcase answer
+    "supervisor": 0.0,  # Deterministic routing decisions
+    "question_analysis": 0.2,  # Precise classification
+    "drafting": 0.7,  # Creative but focused
+    "critic": 0.1,  # Consistent scoring
+    "rewrite": 0.6,  # Creative within constraints
+    "exemplar": 0.75,  # Slightly higher creativity for showcase answer
 }
 
 # --- Time Limits ---

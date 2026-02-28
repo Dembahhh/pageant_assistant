@@ -14,10 +14,10 @@ import logging
 import re
 from typing import Any
 
-from pageant_assistant.schemas.state import RefinerState
-from pageant_assistant.rag.store import retrieve_evidence
-from pageant_assistant.rag.prompts import RELEVANCE_GRADE_PROMPT, CLAIM_VERIFY_PROMPT
 from pageant_assistant.llm.providers import get_llm
+from pageant_assistant.rag.prompts import CLAIM_VERIFY_PROMPT, RELEVANCE_GRADE_PROMPT
+from pageant_assistant.rag.store import retrieve_evidence
+from pageant_assistant.schemas.state import RefinerState
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,7 @@ _RAG_ELIGIBLE: frozenset[str] = frozenset({"issues_based", "advocacy", "leadersh
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
+
 
 def _parse_question_type(question_analysis: str) -> str:
     """Extract the question type label from the analysis text (best-effort).
@@ -90,9 +91,7 @@ def _grade_chunk(llm: Any, question: str, chunk: dict[str, Any]) -> bool:
         )
         return relevant
     except (json.JSONDecodeError, KeyError) as exc:
-        logger.warning(
-            "_grade_chunk: parse error (%s) — defaulting to include chunk", exc
-        )
+        logger.warning("_grade_chunk: parse error (%s) — defaulting to include chunk", exc)
         return True  # Generous default: never silently discard on failure
 
 
@@ -119,9 +118,7 @@ def _format_evidence_block(chunks: list[dict[str, Any]]) -> str:
     ]
     for i, chunk in enumerate(chunks, 1):
         source = chunk.get("source", "")
-        lines.append(
-            f"[{i}] ({chunk.get('chunk_type', 'general')}) {chunk['text']}"
-        )
+        lines.append(f"[{i}] ({chunk.get('chunk_type', 'general')}) {chunk['text']}")
         if source:
             lines.append(f"    Source: {source}")
         lines.append("")
@@ -131,6 +128,7 @@ def _format_evidence_block(chunks: list[dict[str, Any]]) -> str:
 # ---------------------------------------------------------------------------
 # Node: rag_research
 # ---------------------------------------------------------------------------
+
 
 def rag_research(state: RefinerState) -> dict[str, Any]:
     """Retrieve and grade evidence chunks relevant to the current question.
@@ -208,6 +206,7 @@ def rag_research(state: RefinerState) -> dict[str, Any]:
 # Node: claim_verifier
 # ---------------------------------------------------------------------------
 
+
 def claim_verifier(state: RefinerState) -> dict[str, Any]:
     """Verify factual claims in the refined answer against retrieved evidence.
 
@@ -250,12 +249,8 @@ def claim_verifier(state: RefinerState) -> dict[str, Any]:
         data: dict[str, Any] = json.loads(content)
         flags: list[str] = data.get("claim_flags", [])
         verdict: str = data.get("verdict", "grounded")
-        logger.info(
-            "claim_verifier: verdict=%s — %d flag(s)", verdict, len(flags)
-        )
+        logger.info("claim_verifier: verdict=%s — %d flag(s)", verdict, len(flags))
         return {"claim_flags": flags}
     except (json.JSONDecodeError, KeyError) as exc:
-        logger.warning(
-            "claim_verifier: parse error (%s) — returning empty flags", exc
-        )
+        logger.warning("claim_verifier: parse error (%s) — returning empty flags", exc)
         return {"claim_flags": []}

@@ -1,4 +1,5 @@
 from langchain_groq import ChatGroq
+
 from pageant_assistant.config.settings import GROQ_API_KEY, GROQ_MODEL, TEMPERATURE
 
 
@@ -19,9 +20,7 @@ def get_llm(
         EnvironmentError: If GROQ_API_KEY is not set.
     """
     if not GROQ_API_KEY:
-        raise EnvironmentError(
-            "GROQ_API_KEY is not set. Add it to your .env file in the project root."
-        )
+        raise OSError("GROQ_API_KEY is not set. Add it to your .env file in the project root.")
     return ChatGroq(
         model=model or GROQ_MODEL,
         api_key=GROQ_API_KEY,

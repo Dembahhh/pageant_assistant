@@ -23,7 +23,8 @@ jobs:
         run: pip install -e .
 
       - name: Audit Python dependencies for known CVEs
-        run: pip-audit --strict --desc
+        # --skip-editable excludes the local package (pageant-assistant) which isn't on PyPI
+        run: pip-audit --strict --desc --skip-editable
 
   trivy-image-scan:
     runs-on: ubuntu-latest

@@ -1,18 +1,28 @@
 """Rubric loader: load rubric definitions from JSON and format for prompts."""
 
 import json
-from pathlib import Path
 
 from pageant_assistant.config.settings import RUBRICS_DIR
 
-
 # Fallback rubric used when the JSON file is missing or corrupted.
 _DEFAULT_DIMENSIONS = [
-    {"name": "Directness & Clarity", "weight": 1.0, "description": "First sentence answers the question directly."},
+    {
+        "name": "Directness & Clarity",
+        "weight": 1.0,
+        "description": "First sentence answers the question directly.",
+    },
     {"name": "Structure & Flow", "weight": 1.0, "description": "Logical arc from answer to close."},
-    {"name": "Authenticity & Specificity", "weight": 1.2, "description": "Personal and specific, not generic."},
+    {
+        "name": "Authenticity & Specificity",
+        "weight": 1.2,
+        "description": "Personal and specific, not generic.",
+    },
     {"name": "Leadership & Agency", "weight": 1.0, "description": "Shows vision or action."},
-    {"name": "Worldview & Relevance", "weight": 0.8, "description": "Global framing when appropriate."},
+    {
+        "name": "Worldview & Relevance",
+        "weight": 0.8,
+        "description": "Global framing when appropriate.",
+    },
     {"name": "Closing Strength", "weight": 1.0, "description": "Memorable, quotable close."},
     {"name": "Conciseness & Time-Fit", "weight": 1.0, "description": "Within word budget."},
     {"name": "Credibility & Safety", "weight": 0.8, "description": "No unsupported claims."},

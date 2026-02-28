@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-from typing import Optional
 
 from pydantic import ValidationError
 
@@ -30,17 +29,19 @@ def list_personas() -> list[dict]:
     for f in PERSONAS_DIR.glob("*.json"):
         try:
             data = json.loads(f.read_text(encoding="utf-8"))
-            personas.append({
-                "id": data["id"],
-                "name": data["name"],
-                "country": data.get("country", ""),
-            })
+            personas.append(
+                {
+                    "id": data["id"],
+                    "name": data["name"],
+                    "country": data.get("country", ""),
+                }
+            )
         except (json.JSONDecodeError, KeyError):
             continue
     return sorted(personas, key=lambda p: p["name"].lower())
 
 
-def load_persona(persona_id: str) -> Optional[Persona]:
+def load_persona(persona_id: str) -> Persona | None:
     """Load a single persona by ID. Returns None if not found or invalid."""
     path = _persona_path(persona_id)
     if not path.exists():
@@ -87,9 +88,7 @@ def format_persona_context(persona: Persona) -> str:
 
     if persona.personal_stories:
         lines.append("")
-        lines.append(
-            "PERSONAL STORIES (draw from these for authentic personal anchors):"
-        )
+        lines.append("PERSONAL STORIES (draw from these for authentic personal anchors):")
         for i, story in enumerate(persona.personal_stories, 1):
             lines.append(f'{i}. "{story.title}" -- {story.text}')
             lines.append(f"   Key lesson: {story.key_lesson}")

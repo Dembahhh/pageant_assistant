@@ -10,36 +10,37 @@ M4 additions: CRAG evidence retrieval (rag_research), claim verification (claim_
 
 import json
 import re
-from langgraph.graph import StateGraph, START, END
 
-from pageant_assistant.schemas.state import RefinerState
-from pageant_assistant.schemas.rubric import CriticOutput
-from pageant_assistant.llm.providers import get_llm
-from pageant_assistant.llm.prompts import (
-    QUESTION_ANALYSIS_PROMPT,
-    DRAFTING_PROMPT,
-    CRITIC_PROMPT,
-    REWRITE_PROMPT,
-    COACH_REPORT_PROMPT,
-    EXEMPLAR_PROMPT,
-    STYLE_INSTRUCTIONS,
-)
+from langgraph.graph import END, START, StateGraph
+
 from pageant_assistant.config.settings import (
-    WORDS_PER_SECOND,
-    DEFAULT_TIME_LIMIT,
     DEFAULT_RUBRIC,
+    DEFAULT_TIME_LIMIT,
+    WORDS_PER_SECOND,
 )
-from pageant_assistant.rubrics.loader import load_rubric, format_rubric_for_prompt
 from pageant_assistant.exemplars.library import (
     find_exemplar,
     format_exemplar_reference,
 )
-from pageant_assistant.rag.nodes import rag_research, claim_verifier
-
+from pageant_assistant.llm.prompts import (
+    COACH_REPORT_PROMPT,
+    CRITIC_PROMPT,
+    DRAFTING_PROMPT,
+    EXEMPLAR_PROMPT,
+    QUESTION_ANALYSIS_PROMPT,
+    REWRITE_PROMPT,
+    STYLE_INSTRUCTIONS,
+)
+from pageant_assistant.llm.providers import get_llm
+from pageant_assistant.rag.nodes import claim_verifier, rag_research
+from pageant_assistant.rubrics.loader import format_rubric_for_prompt, load_rubric
+from pageant_assistant.schemas.rubric import CriticOutput
+from pageant_assistant.schemas.state import RefinerState
 
 # ---------------------------------------------------------------------------
 # Helper
 # ---------------------------------------------------------------------------
+
 
 def _word_budget(time_limit: int) -> int:
     """Convert a time limit in seconds to an approximate word count."""
@@ -111,6 +112,7 @@ def _clean_prompt(text: str) -> str:
 # ---------------------------------------------------------------------------
 # Graph nodes
 # ---------------------------------------------------------------------------
+
 
 def question_understanding(state: RefinerState) -> dict:
     """Classify the question and identify what judges are testing."""
@@ -265,6 +267,7 @@ def generate_exemplar(state: RefinerState) -> dict:
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _infer_question_type(question_analysis: str) -> str:
     """Best-effort extraction of question type from the analysis text."""
     analysis_lower = question_analysis.lower()
@@ -279,6 +282,7 @@ def _infer_question_type(question_analysis: str) -> str:
 # ---------------------------------------------------------------------------
 # Conditional edge: should we loop back to critic for another pass?
 # ---------------------------------------------------------------------------
+
 
 def should_reloop(state: RefinerState) -> str:
     """Decide whether to do another critic->rewrite pass or proceed to verification.
@@ -318,6 +322,7 @@ def should_reloop(state: RefinerState) -> str:
 # ---------------------------------------------------------------------------
 # Build the graph
 # ---------------------------------------------------------------------------
+
 
 def build_refiner_graph() -> StateGraph:
     """Construct and compile the M4 Q&A Refiner graph.

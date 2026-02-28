@@ -22,7 +22,7 @@ RUN python -m venv /build/venv && \
 # Downloads all-MiniLM-L6-v2 to ~/.cache/chroma/ at build time
 # so containers don't have a 30-60s cold-start delay on first request
 RUN /build/venv/bin/python -c \
-    "from chromadb.utils.embedding_functions import DefaultEmbeddingFunction; DefaultEmbeddingFunction()()"
+    "from chromadb.utils.embedding_functions import DefaultEmbeddingFunction; DefaultEmbeddingFunction()(['warmup'])"
 
 
 # ============================================================

@@ -16,15 +16,15 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install pip-audit
-        run: pip install pip-audit
-
-      - name: Install package dependencies
-        run: pip install -e .
+      - name: Install pip-audit and pip-tools
+        run: pip install pip-audit pip-tools
 
       - name: Audit Python dependencies for known CVEs
-        # --skip-editable excludes the local package (pageant-assistant) which isn't on PyPI
-        run: pip-audit --strict --desc --skip-editable
+        # Compile deps from pyproject.toml (excludes our local package, which isn't on PyPI)
+        # then audit only those third-party packages
+        run: |
+          pip-compile pyproject.toml --no-header --quiet -o /tmp/audit-reqs.txt
+          pip-audit --strict --desc -r /tmp/audit-reqs.txt
 
   trivy-image-scan:
     runs-on: ubuntu-latest

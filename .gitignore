@@ -9,4 +9,3 @@ data/chroma/
 venv/
 docs/
 .agent/
-tests/

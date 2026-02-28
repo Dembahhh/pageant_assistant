@@ -6,8 +6,8 @@ FROM python:3.11-slim@sha256:fba6f3b73795df99960f4269b297420bdbe01a8631fc31ea3f1
 
 WORKDIR /build
 
-# Install pinned build tools
-RUN pip install --no-cache-dir setuptools==75.8.2 wheel==0.45.1
+# Upgrade build tools to latest patched versions (pinning old versions risks known CVEs)
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Copy package manifest first (layer caching: only re-installs if deps change)
 COPY pyproject.toml .

@@ -122,7 +122,7 @@ class TestFormatPersonaContext:
     def test_format_includes_stories(self, sample_persona):
         text = format_persona_context(sample_persona)
         assert "Teaching in Rural Zambia" in text
-        assert "Key lesson" in text.lower() or "key_lesson" in text.lower()
+        assert "key lesson" in text.lower()
 
     def test_format_none_returns_empty(self):
         assert format_persona_context(None) == ""

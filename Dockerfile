@@ -37,6 +37,10 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
+# Upgrade system Python build tools to patched versions
+# (base image ships old wheel/setuptools with known CVEs)
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel "jaraco.context>=6.1.0"
+
 # Create non-root user with no login shell
 RUN groupadd -r appuser && \
     useradd --no-log-init -r -g appuser -m -s /bin/false appuser

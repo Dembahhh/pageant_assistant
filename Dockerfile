@@ -13,9 +13,10 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 COPY pyproject.toml .
 COPY src/ src/
 
-# Create venv and install the package with all dependencies
+# Create venv; upgrade the ensurepip-seeded tools to patched versions before
+# installing app deps (ensurepip bundles old wheel/setuptools with known CVEs)
 RUN python -m venv /build/venv && \
-    /build/venv/bin/pip install --no-cache-dir --upgrade pip && \
+    /build/venv/bin/pip install --no-cache-dir --upgrade pip setuptools wheel "jaraco.context>=6.1.0" && \
     /build/venv/bin/pip install --no-cache-dir .
 
 # Pre-warm the ChromaDB ONNX embedding model (~79MB)

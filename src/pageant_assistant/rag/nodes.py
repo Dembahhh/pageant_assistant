@@ -54,9 +54,7 @@ def _parse_question_type(question_analysis: str) -> str:
     return "personal"  # Conservative default
 
 
-def _batch_grade_chunks(
-    llm: Any, question: str, chunks: list[dict[str, Any]]
-) -> list[bool]:
+def _batch_grade_chunks(llm: Any, question: str, chunks: list[dict[str, Any]]) -> list[bool]:
     """Grade all evidence chunks for relevance in a single LLM call.
 
     Args:

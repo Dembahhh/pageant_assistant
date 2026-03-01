@@ -1,6 +1,6 @@
 import logging
 
-import groq
+import requests
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -200,7 +200,10 @@ st.markdown(
         border: 1px solid #252535 !important;
     }
 
-    #MainMenu, footer, header {visibility: hidden;}
+    #MainMenu, footer {visibility: hidden;}
+    /* Keep the header visible — it contains the sidebar toggle arrow.
+       Only hide the Streamlit "Deploy" button inside it. */
+    [data-testid="stToolbar"] {visibility: hidden;}
 </style>
 """,
     unsafe_allow_html=True,
@@ -477,15 +480,23 @@ with col_output:
                     st.session_state.result = accumulated
                     status.update(label="Coaching complete", state="complete", expanded=False)
 
-                except groq.AuthenticationError:
-                    status.update(label="Authentication failed", state="error")
-                    st.error("Authentication failed. Check your GROQ_API_KEY in .env.")
-                except groq.RateLimitError:
-                    status.update(label="Rate limited", state="error")
-                    st.error("Groq rate limit reached. Wait a moment and try again.")
-                except groq.APIConnectionError:
+                except requests.HTTPError as e:
+                    code = e.response.status_code if e.response is not None else 0
+                    if code == 401:
+                        status.update(label="Authentication failed", state="error")
+                        st.error("Authentication failed. Check your GROQ_API_KEY.")
+                    elif code == 429:
+                        status.update(label="Rate limited", state="error")
+                        st.error("Groq rate limit reached. Wait a moment and try again.")
+                    else:
+                        status.update(label="API error", state="error")
+                        st.error(f"Groq API error ({code}): {e}")
+                except (requests.ConnectionError, ConnectionError):
                     status.update(label="Connection failed", state="error")
                     st.error("Could not connect to Groq. Check your internet connection.")
+                except requests.Timeout:
+                    status.update(label="Request timed out", state="error")
+                    st.error("Groq request timed out. Try again.")
                 except Exception as e:
                     status.update(label="An error occurred", state="error")
                     st.error(f"Error: {e}")

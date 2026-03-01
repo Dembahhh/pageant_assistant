@@ -1,6 +1,10 @@
-"""Voice I/O: speech-to-text (Groq Whisper) and text-to-speech (Groq PlayAI)."""
+"""Voice I/O: speech-to-text (Groq Whisper) and text-to-speech (Groq PlayAI).
 
-from groq import Groq
+Both functions use ``requests`` (urllib3) instead of the Groq SDK (httpx)
+because httpx fails on Streamlit Community Cloud with Python 3.13.
+"""
+
+import requests as _req
 
 from pageant_assistant.config.settings import (
     GROQ_API_KEY,
@@ -10,12 +14,12 @@ from pageant_assistant.config.settings import (
     TTS_VOICE,
 )
 
+_GROQ_STT_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
+_GROQ_TTS_URL = "https://api.groq.com/openai/v1/audio/speech"
+
 
 def transcribe_audio(audio_bytes: bytes, filename: str = "answer.webm") -> str:
     """Transcribe audio bytes to text using Groq Whisper.
-
-    Uses requests (urllib3) directly instead of the Groq SDK (httpx) because
-    httpx's multipart upload fails on some hosted environments (SCC/Python 3.13).
 
     Args:
         audio_bytes: Raw audio data from st.audio_input (browser records WebM).
@@ -24,10 +28,8 @@ def transcribe_audio(audio_bytes: bytes, filename: str = "answer.webm") -> str:
     Returns:
         Transcribed text string.
     """
-    import requests as _req
-
     resp = _req.post(
-        "https://api.groq.com/openai/v1/audio/transcriptions",
+        _GROQ_STT_URL,
         headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
         files={"file": (filename, audio_bytes)},
         data={"model": STT_MODEL, "language": "en"},
@@ -45,13 +47,21 @@ def synthesize_speech(text: str, voice: str | None = None) -> bytes:
         voice: Override the default voice.
 
     Returns:
-        WAV audio bytes ready for st.audio().
+        Audio bytes ready for st.audio().
     """
-    client = Groq(api_key=GROQ_API_KEY)
-    response = client.audio.speech.create(
-        model=TTS_MODEL,
-        voice=voice or TTS_VOICE,
-        input=text,
-        response_format=TTS_RESPONSE_FORMAT,
+    resp = _req.post(
+        _GROQ_TTS_URL,
+        headers={
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": TTS_MODEL,
+            "voice": voice or TTS_VOICE,
+            "input": text,
+            "response_format": TTS_RESPONSE_FORMAT,
+        },
+        timeout=120,
     )
-    return response.read()
+    resp.raise_for_status()
+    return resp.content

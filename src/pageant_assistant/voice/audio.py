@@ -11,23 +11,30 @@ from pageant_assistant.config.settings import (
 )
 
 
-def transcribe_audio(audio_bytes: bytes, filename: str = "answer.wav") -> str:
+def transcribe_audio(audio_bytes: bytes, filename: str = "answer.webm") -> str:
     """Transcribe audio bytes to text using Groq Whisper.
 
+    Uses requests (urllib3) directly instead of the Groq SDK (httpx) because
+    httpx's multipart upload fails on some hosted environments (SCC/Python 3.13).
+
     Args:
-        audio_bytes: Raw audio data (WAV format from st.audio_input).
-        filename: Filename hint for the API.
+        audio_bytes: Raw audio data from st.audio_input (browser records WebM).
+        filename: Filename hint — extension tells Groq the audio format.
 
     Returns:
         Transcribed text string.
     """
-    client = Groq(api_key=GROQ_API_KEY)
-    transcription = client.audio.transcriptions.create(
-        file=(filename, audio_bytes),
-        model=STT_MODEL,
-        language="en",
+    import requests as _req
+
+    resp = _req.post(
+        "https://api.groq.com/openai/v1/audio/transcriptions",
+        headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
+        files={"file": (filename, audio_bytes)},
+        data={"model": STT_MODEL, "language": "en"},
+        timeout=120,
     )
-    return transcription.text
+    resp.raise_for_status()
+    return resp.json()["text"]
 
 
 def synthesize_speech(text: str, voice: str | None = None) -> bytes:

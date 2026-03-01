@@ -204,6 +204,13 @@ st.markdown(
     /* Keep the header visible — it contains the sidebar toggle arrow.
        Only hide the Streamlit "Deploy" button inside it. */
     [data-testid="stToolbar"] {visibility: hidden;}
+
+    /* Force sidebar to always be visible on SCC (prevents collapsed-with-no-toggle) */
+    section[data-testid="stSidebar"] {
+        min-width: 280px !important;
+        max-width: 320px !important;
+        transform: none !important;
+    }
 </style>
 """,
     unsafe_allow_html=True,
@@ -288,7 +295,10 @@ with st.sidebar:
             st.session_state.active_persona = None
         st.session_state.result = None
 
-    st.page_link("pages/1_My_Profile.py", label="Edit My Profile", use_container_width=True)
+    try:
+        st.page_link("pages/1_My_Profile.py", label="Edit My Profile", use_container_width=True)
+    except Exception:
+        pass  # Page path may not resolve on SCC — never crash the sidebar
 
     if not profiles:
         st.caption("Head over to **My Profile** to set up your contestant profile.")

@@ -54,45 +54,64 @@ def _parse_question_type(question_analysis: str) -> str:
     return "personal"  # Conservative default
 
 
-def _grade_chunk(llm: Any, question: str, chunk: dict[str, Any]) -> bool:
-    """Ask the LLM whether a single evidence chunk is relevant to the question.
+def _batch_grade_chunks(
+    llm: Any, question: str, chunks: list[dict[str, Any]]
+) -> list[bool]:
+    """Grade all evidence chunks for relevance in a single LLM call.
 
     Args:
         llm: An initialised LLM instance (low temperature for consistency).
         question: The pageant question being answered.
-        chunk: A chunk dict with at least a ``text`` key.
+        chunks: List of chunk dicts, each with at least a ``text`` key.
 
     Returns:
-        True if the chunk is relevant, False otherwise.  Returns True on any
-        parse failure to avoid silently discarding potentially useful evidence.
-
-    Example:
-        >>> llm = get_llm("critic")
-        >>> _grade_chunk(llm, "What is leadership?", {"text": "Leaders inspire...", "chunk_type": "framing"})
-        True
+        A list of booleans parallel to ``chunks`` — True means relevant.
+        On any parse failure, returns all True (generous default: never
+        silently discard evidence).
     """
+    # Build a numbered block of all chunks
+    lines: list[str] = []
+    for i, chunk in enumerate(chunks, 1):
+        lines.append(f"[{i}] ({chunk.get('chunk_type', 'general')}) {chunk['text']}")
+    chunks_block = "\n".join(lines)
+
     try:
         prompt = RELEVANCE_GRADE_PROMPT.format(
             question=question,
-            chunk_text=chunk["text"],
+            chunks_block=chunks_block,
+            chunk_count=len(chunks),
         )
         response = llm.invoke(prompt)
         content = response.content.strip()
-        # Strip markdown code fences the LLM sometimes adds
+        # Strip markdown code fences
         content = re.sub(r"^```(?:json)?\s*", "", content)
         content = re.sub(r"\s*```$", "", content.strip())
         data: dict[str, Any] = json.loads(content)
-        relevant = bool(data.get("relevant", False))
-        logger.debug(
-            "_grade_chunk: topic=%s type=%s → relevant=%s",
-            chunk.get("topic"),
-            chunk.get("chunk_type"),
-            relevant,
+        verdicts = data.get("relevant", [])
+
+        # Validate: must be a list of bools with correct length
+        if isinstance(verdicts, list) and len(verdicts) == len(chunks):
+            results = [bool(v) for v in verdicts]
+            for i, (chunk, rel) in enumerate(zip(chunks, results)):
+                logger.debug(
+                    "_batch_grade: [%d] topic=%s type=%s → relevant=%s",
+                    i + 1,
+                    chunk.get("topic"),
+                    chunk.get("chunk_type"),
+                    rel,
+                )
+            return results
+
+        logger.warning(
+            "_batch_grade: expected %d verdicts, got %d — defaulting all to relevant",
+            len(chunks),
+            len(verdicts) if isinstance(verdicts, list) else 0,
         )
-        return relevant
+        return [True] * len(chunks)
+
     except (json.JSONDecodeError, KeyError) as exc:
-        logger.warning("_grade_chunk: parse error (%s) — defaulting to include chunk", exc)
-        return True  # Generous default: never silently discard on failure
+        logger.warning("_batch_grade: parse error (%s) — defaulting all to relevant", exc)
+        return [True] * len(chunks)
 
 
 def _format_evidence_block(chunks: list[dict[str, Any]]) -> str:
@@ -168,10 +187,11 @@ def rag_research(state: RefinerState) -> dict[str, Any]:
         logger.info("rag_research: no chunks retrieved from store")
         return {"rag_evidence": None, "rag_question_type": q_type}
 
-    # Grade each chunk for relevance using a low-temperature LLM call
+    # Batch-grade all chunks for relevance in a single LLM call
     llm = get_llm("critic")
+    verdicts = _batch_grade_chunks(llm, question, raw_chunks)
     graded: list[dict[str, Any]] = [
-        chunk for chunk in raw_chunks if _grade_chunk(llm, question, chunk)
+        chunk for chunk, relevant in zip(raw_chunks, verdicts) if relevant
     ]
     logger.info(
         "rag_research: %d/%d chunk(s) passed relevance grading",

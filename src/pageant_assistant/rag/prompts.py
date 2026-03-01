@@ -5,7 +5,7 @@ concerns from the main generation prompts.
 """
 
 # ---------------------------------------------------------------------------
-# Relevance grader — called per-chunk inside rag_research
+# Relevance grader — batch-grades all chunks in a single LLM call
 # ---------------------------------------------------------------------------
 
 RELEVANCE_GRADE_PROMPT = """\
@@ -14,20 +14,20 @@ You are a relevance assessor for a pageant coaching assistant.
 QUESTION:
 {question}
 
-EVIDENCE CHUNK:
-{chunk_text}
+EVIDENCE CHUNKS:
+{chunks_block}
 
-Does this chunk contain information that could support, frame, or ground an \
-answer to the question above?
+For EACH numbered chunk above, decide whether it contains information that \
+could support, frame, or ground an answer to the question.
 
-Respond with ONLY valid JSON — no markdown, no commentary, no extra keys:
-{{"relevant": true}}
-or
-{{"relevant": false}}
+Respond with ONLY valid JSON — no markdown, no commentary:
+{{"relevant": [true, false, true, ...]}}
 
-Be generous: mark relevant if the chunk provides context, framing, statistics, \
+The array MUST contain exactly {chunk_count} booleans, one per chunk in order.
+
+Be generous: mark true if the chunk provides context, framing, statistics, \
 named programmes, or examples related to the question topic. \
-Mark irrelevant ONLY if the chunk is completely off-topic."""
+Mark false ONLY if the chunk is completely off-topic."""
 
 # ---------------------------------------------------------------------------
 # Claim verifier — called once per refined answer inside claim_verifier

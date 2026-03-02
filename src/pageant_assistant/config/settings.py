@@ -43,15 +43,27 @@ TEMPERATURE = {
 VALID_TIME_LIMITS = [20, 30, 40]  # seconds
 DEFAULT_TIME_LIMIT = 30
 
-# Approximate words-per-second for spoken answers
-WORDS_PER_SECOND = 2.5
-
 # --- Style Presets ---
+# Each preset has a display name and a words-per-second rate for word budgets.
+# Bold/punchy styles use shorter sentences delivered faster; warm/diplomatic
+# styles use longer measured sentences, so fewer words fit the same time limit.
 STYLE_PRESETS = {
     "structured_narrative": "Structured Narrative (Catriona-style)",
     "values_shared_agency": "Values + Shared Agency (Zozibini-style)",
+    "bold_punchy": "Bold & Punchy (Harnaaz-style)",
+    "warm_diplomatic": "Warm & Diplomatic (Andrea-style)",
+    "policy_grounded": "Policy-Grounded (R'Bonney-style)",
 }
 DEFAULT_STYLE = "structured_narrative"
+
+# Words-per-second by style preset — used to calculate word budgets from time limits.
+WORDS_PER_SECOND: dict[str, float] = {
+    "structured_narrative": 2.5,
+    "values_shared_agency": 2.5,
+    "bold_punchy": 3.0,
+    "warm_diplomatic": 2.3,
+    "policy_grounded": 2.5,
+}
 
 # --- Paths ---
 DATA_DIR = PROJECT_ROOT / "data"

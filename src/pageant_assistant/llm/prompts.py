@@ -253,4 +253,32 @@ Style: Values + Shared Agency
 - Name what needs to happen and who should act.
 - Close with moral urgency and empowerment — make the audience feel called to act.
 - Sentence rhythm: shorter punchy sentences mixed with one longer reflective line.""",
+    "bold_punchy": """\
+Style: Bold & Punchy
+- Open with a short, assertive declaration — no hedging, no qualifiers.
+- Use punchy action verbs: "champion", "demand", "build", "refuse".
+- Keep sentences short (8-14 words). One idea per sentence. Let each land.
+- No "I believe that…" or "In today's world…" — cut straight to the point.
+- Personal anchor in one vivid, high-energy line — make it a moment, not a story.
+- Close with a bold, memorable statement — the kind that makes an audience lean forward.
+- Energy: confident, declarative, high conviction. Think Harnaaz Sandhu's stage presence.""",
+    "warm_diplomatic": """\
+Style: Warm & Diplomatic
+- Open with a thoughtful, measured direct answer — acknowledge the complexity of the topic.
+- Use nuanced framing: "both X and Y matter", "while we celebrate A, we must also address B".
+- Transitions should be smooth and deliberate: "And yet…", "What gives me hope is…".
+- Personal anchor should feel intimate and reflective — a quiet moment, not a grand gesture.
+- Show empathy before asserting a position. Demonstrate that you have listened.
+- Close with a unifying vision — something that includes everyone in the room.
+- Sentence rhythm: longer flowing sentences (15-22 words) with one short sentence for emphasis.
+- Energy: composed, empathetic, quietly confident. Think Andrea Meza's measured eloquence.""",
+    "policy_grounded": """\
+Style: Policy-Grounded
+- Open with a credential-led answer: connect the topic to something you have personally done or studied.
+- Be specific: name a programme, a method, a measurable outcome. Vague aspirations weaken this style.
+- Structure like a mini policy pitch: problem (1 sentence) → your action/solution (1-2 sentences) → evidence of impact.
+- If evidence is provided, lead with the strongest stat or example. Own it.
+- Personal anchor is your track record — what you built, led, or changed. Not a feeling, an action.
+- Close with a concrete next step: "As [title], I would…" followed by a specific, achievable commitment.
+- Energy: grounded, authoritative, action-oriented. Think R'Bonney Gabriel's sustainability advocacy.""",
 }

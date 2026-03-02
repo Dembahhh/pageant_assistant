@@ -42,9 +42,14 @@ from pageant_assistant.schemas.state import RefinerState
 # ---------------------------------------------------------------------------
 
 
-def _word_budget(time_limit: int) -> int:
-    """Convert a time limit in seconds to an approximate word count."""
-    return int(time_limit * WORDS_PER_SECOND)
+def _word_budget(time_limit: int, style_key: str = "structured_narrative") -> int:
+    """Convert a time limit in seconds to an approximate word count.
+
+    Uses per-style words-per-second rates from settings. Falls back to 2.5
+    if the style key is missing from the dict.
+    """
+    wps = WORDS_PER_SECOND.get(style_key, 2.5)
+    return int(time_limit * wps)
 
 
 def _parse_critic_json(text: str) -> CriticOutput | None:
@@ -132,7 +137,7 @@ def drafting(state: RefinerState) -> dict:
         raw_answer=state["raw_answer"],
         question_analysis=state["question_analysis"],
         time_limit=time_limit,
-        word_budget=_word_budget(time_limit),
+        word_budget=_word_budget(time_limit, style_key),
         style_description=STYLE_INSTRUCTIONS.get(style_key, ""),
         style_instructions=STYLE_INSTRUCTIONS.get(style_key, ""),
         persona_context=state.get("persona_context", ""),
@@ -163,11 +168,12 @@ def critic(state: RefinerState) -> dict:
     # On second pass, score the rewrite instead of the original draft
     answer_to_score = state.get("refined_answer") or state["draft_answer"]
 
+    style_key = state.get("style_preset", "structured_narrative")
     prompt = CRITIC_PROMPT.format(
         question=state["question"],
         draft_answer=answer_to_score,
         time_limit=time_limit,
-        word_budget=_word_budget(time_limit),
+        word_budget=_word_budget(time_limit, style_key),
         persona_context=state.get("persona_context", ""),
         rubric_dimensions=rubric_text,
         exemplar_structural_notes=exemplar_notes,
@@ -207,7 +213,7 @@ def rewrite(state: RefinerState) -> dict:
         draft_answer=state.get("refined_answer") or state["draft_answer"],
         critique=_format_critique_for_rewrite(state),
         time_limit=time_limit,
-        word_budget=_word_budget(time_limit),
+        word_budget=_word_budget(time_limit, style_key),
         style_instructions=STYLE_INSTRUCTIONS.get(style_key, ""),
         persona_context=state.get("persona_context", ""),
         evidence_block=state.get("rag_evidence") or "",
@@ -255,7 +261,7 @@ def generate_exemplar(state: RefinerState) -> dict:
         question=state["question"],
         question_analysis=state["question_analysis"],
         time_limit=time_limit,
-        word_budget=_word_budget(time_limit),
+        word_budget=_word_budget(time_limit, style_key),
         style_instructions=STYLE_INSTRUCTIONS.get(style_key, ""),
         exemplar_reference=exemplar_text,
     )

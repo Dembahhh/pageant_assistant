@@ -341,11 +341,12 @@ with st.sidebar:
     )
 
     st.divider()
-    word_budget = int(time_limit * WORDS_PER_SECOND)
+    wps = WORDS_PER_SECOND.get(style_preset, 2.5)
+    word_budget = int(time_limit * wps)
     st.markdown(
         f"<div style='font-family: Inter, sans-serif; font-size: 0.75rem; "
         f"color: #6b6b7b; line-height: 1.8;'>"
-        f"Target: ~{word_budget} words / {time_limit}s<br>"
+        f"Target: ~{word_budget} words / {time_limit}s ({wps} wps)<br>"
         f"Pipeline: Analyze &rarr; Research &rarr; Draft &rarr; Critique &rarr; Rewrite &rarr; Verify &rarr; Report"
         f"</div>",
         unsafe_allow_html=True,

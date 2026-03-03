@@ -317,7 +317,7 @@ with st.sidebar:
         st.session_state.result = None
 
     try:
-        st.page_link("My_Profile.py", label="Edit My Profile", use_container_width=True)
+        st.page_link("streamlit_app.py", label="Edit My Profile", use_container_width=True)
     except Exception:
         pass  # Page path may not resolve on SCC — never crash the sidebar
 

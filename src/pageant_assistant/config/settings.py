@@ -95,6 +95,14 @@ RAG_COLLECTION_NAME = "pageant_evidence"
 STT_MODEL = "whisper-large-v3-turbo"
 TTS_MODEL = "canopylabs/orpheus-v1-english"
 TTS_VOICE = "hannah"
+TTS_VOICES: dict[str, str] = {
+    "hannah": "Hannah (Female)",
+    "diana": "Diana (Female)",
+    "autumn": "Autumn (Female)",
+    "austin": "Austin (Male)",
+    "daniel": "Daniel (Male)",
+    "troy": "Troy (Male)",
+}
 TTS_RESPONSE_FORMAT = "wav"
 
 # --- LangSmith (optional) ---

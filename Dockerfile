@@ -85,4 +85,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')"
 
 # Run the Streamlit app
-ENTRYPOINT ["streamlit", "run", "apps/streamlit_app.py"]
+ENTRYPOINT ["streamlit", "run", "apps/My_Profile.py"]

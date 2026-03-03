@@ -240,6 +240,126 @@
       "question_type": "fun_creative",
       "difficulty": "advanced",
       "tags": ["self-awareness", "wit", "depth"]
+    },
+    {
+      "id": "q031",
+      "text": "How can young women contribute to peace-building in their communities?",
+      "pageant_type": "miss_grand",
+      "question_type": "advocacy",
+      "difficulty": "beginner",
+      "tags": ["peace", "community", "youth"]
+    },
+    {
+      "id": "q032",
+      "text": "What does it mean to be a voice for the voiceless in times of conflict?",
+      "pageant_type": "miss_grand",
+      "question_type": "issues_based",
+      "difficulty": "intermediate",
+      "tags": ["peace", "advocacy", "courage"]
+    },
+    {
+      "id": "q033",
+      "text": "If you could address the United Nations General Assembly, what message about peace would you deliver?",
+      "pageant_type": "miss_grand",
+      "question_type": "leadership",
+      "difficulty": "advanced",
+      "tags": ["diplomacy", "global", "peace"]
+    },
+    {
+      "id": "q034",
+      "text": "How has your personal experience shaped your understanding of peace and tolerance?",
+      "pageant_type": "miss_grand",
+      "question_type": "personal",
+      "difficulty": "intermediate",
+      "tags": ["peace", "personal growth", "tolerance"]
+    },
+    {
+      "id": "q035",
+      "text": "What is one conflict in the world today that you believe deserves more attention, and what would you do about it?",
+      "pageant_type": "miss_grand",
+      "question_type": "issues_based",
+      "difficulty": "advanced",
+      "tags": ["conflict", "awareness", "action"]
+    },
+    {
+      "id": "q036",
+      "text": "What is the most important environmental issue facing your country right now?",
+      "pageant_type": "miss_earth",
+      "question_type": "issues_based",
+      "difficulty": "beginner",
+      "tags": ["environment", "local", "awareness"]
+    },
+    {
+      "id": "q037",
+      "text": "Describe a specific action you have taken to protect the environment in your community.",
+      "pageant_type": "miss_earth",
+      "question_type": "personal",
+      "difficulty": "intermediate",
+      "tags": ["environment", "action", "community"]
+    },
+    {
+      "id": "q038",
+      "text": "How would you convince a corporation to adopt more sustainable practices?",
+      "pageant_type": "miss_earth",
+      "question_type": "leadership",
+      "difficulty": "advanced",
+      "tags": ["sustainability", "persuasion", "policy"]
+    },
+    {
+      "id": "q039",
+      "text": "What role should young people play in the fight against climate change?",
+      "pageant_type": "miss_earth",
+      "question_type": "advocacy",
+      "difficulty": "intermediate",
+      "tags": ["climate", "youth", "advocacy"]
+    },
+    {
+      "id": "q040",
+      "text": "If you had to choose between economic development and environmental protection, how would you approach that dilemma?",
+      "pageant_type": "miss_earth",
+      "question_type": "issues_based",
+      "difficulty": "advanced",
+      "tags": ["environment", "economics", "nuance"]
+    },
+    {
+      "id": "q041",
+      "text": "What is a tradition from your culture that you wish the whole world could experience?",
+      "pageant_type": "miss_charm",
+      "question_type": "personal",
+      "difficulty": "beginner",
+      "tags": ["culture", "heritage", "warmth"]
+    },
+    {
+      "id": "q042",
+      "text": "Tell us about a moment that made you proud to represent your country.",
+      "pageant_type": "miss_charm",
+      "question_type": "personal",
+      "difficulty": "intermediate",
+      "tags": ["culture", "pride", "storytelling"]
+    },
+    {
+      "id": "q043",
+      "text": "How do you use your personal charm to create positive change in the lives of others?",
+      "pageant_type": "miss_charm",
+      "question_type": "advocacy",
+      "difficulty": "intermediate",
+      "tags": ["charisma", "impact", "connection"]
+    },
+    {
+      "id": "q044",
+      "text": "What makes your country's culture unique, and how would you share it with the world?",
+      "pageant_type": "miss_charm",
+      "question_type": "leadership",
+      "difficulty": "beginner",
+      "tags": ["culture", "representation", "storytelling"]
+    },
+    {
+      "id": "q045",
+      "text": "Describe a time when a stranger's kindness changed your day — and what it taught you about human connection.",
+      "pageant_type": "miss_charm",
+      "question_type": "fun_creative",
+      "difficulty": "intermediate",
+      "tags": ["warmth", "storytelling", "connection"]
     }
   ]
 }

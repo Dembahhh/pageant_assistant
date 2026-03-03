@@ -62,6 +62,9 @@ def get_filter_options() -> dict:
             ("miss_universe", "Miss Universe"),
             ("miss_world", "Miss World"),
             ("miss_usa", "Miss USA"),
+            ("miss_grand", "Miss Grand International"),
+            ("miss_earth", "Miss Earth"),
+            ("miss_charm", "Miss Charm"),
             ("general", "General"),
         ],
         "question_type": [

@@ -1,5 +1,7 @@
 """Tests for rubric loading and formatting."""
 
+import pytest
+
 from pageant_assistant.rubrics.loader import format_rubric_for_prompt, load_rubric
 
 
@@ -51,3 +53,41 @@ class TestFormatRubricForPrompt:
         text = format_rubric_for_prompt(rubric)
         assert "SCORING DIMENSIONS" in text
         assert len(text) > 100
+
+
+class TestNewRubrics:
+    @pytest.mark.parametrize("rubric_name", ["miss_grand", "miss_earth", "miss_charm"])
+    def test_load_new_rubric(self, rubric_name):
+        rubric = load_rubric(rubric_name)
+        assert "dimensions" in rubric
+        assert len(rubric["dimensions"]) == 8
+        assert rubric["version"] != "fallback"
+
+    @pytest.mark.parametrize("rubric_name", ["miss_grand", "miss_earth", "miss_charm"])
+    def test_new_rubric_dimensions_have_required_fields(self, rubric_name):
+        rubric = load_rubric(rubric_name)
+        for dim in rubric["dimensions"]:
+            assert "name" in dim
+            assert "weight" in dim
+            assert "description" in dim
+            assert isinstance(dim["weight"], (int, float))
+
+    @pytest.mark.parametrize("rubric_name", ["miss_grand", "miss_earth", "miss_charm"])
+    def test_new_rubric_has_cap_rules(self, rubric_name):
+        rubric = load_rubric(rubric_name)
+        assert "cap_rules" in rubric
+        assert len(rubric["cap_rules"]) > 0
+
+    @pytest.mark.parametrize("rubric_name", ["miss_grand", "miss_earth", "miss_charm"])
+    def test_new_rubric_has_genericness_signals(self, rubric_name):
+        rubric = load_rubric(rubric_name)
+        assert "genericness_signals" in rubric
+        assert len(rubric["genericness_signals"]) > 0
+
+    @pytest.mark.parametrize("rubric_name", ["miss_grand", "miss_earth", "miss_charm"])
+    def test_new_rubric_formats_for_prompt(self, rubric_name):
+        rubric = load_rubric(rubric_name)
+        text = format_rubric_for_prompt(rubric)
+        assert "SCORING DIMENSIONS" in text
+        for dim in rubric["dimensions"]:
+            assert dim["name"] in text

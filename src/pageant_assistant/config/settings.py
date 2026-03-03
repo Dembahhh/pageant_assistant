@@ -80,6 +80,14 @@ for _d in (DATA_DIR, CHROMA_DIR, QUESTIONS_DIR, PERSONAS_DIR, EXEMPLARS_DIR):
 # --- Rubric ---
 DEFAULT_RUBRIC = "miss_universe"
 
+# Display names for available rubrics (keyed by filename without extension)
+AVAILABLE_RUBRICS: dict[str, str] = {
+    "miss_universe": "Miss Universe",
+    "miss_grand": "Miss Grand International",
+    "miss_earth": "Miss Earth",
+    "miss_charm": "Miss Charm",
+}
+
 # --- RAG ---
 RAG_COLLECTION_NAME = "pageant_evidence"
 

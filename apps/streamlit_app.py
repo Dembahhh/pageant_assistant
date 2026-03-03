@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from pageant_assistant.config.settings import (
+    AVAILABLE_RUBRICS,
+    DEFAULT_RUBRIC,
     DEFAULT_STYLE,
     DEFAULT_TIME_LIMIT,
     GROQ_API_KEY,
@@ -321,6 +323,13 @@ with st.sidebar:
         format_func=lambda x: STYLE_PRESETS[x],
     )
 
+    rubric_name = st.selectbox(
+        "Scoring rubric",
+        options=list(AVAILABLE_RUBRICS.keys()),
+        index=list(AVAILABLE_RUBRICS.keys()).index(DEFAULT_RUBRIC),
+        format_func=lambda x: AVAILABLE_RUBRICS[x],
+    )
+
     st.divider()
     st.markdown('<div class="section-label">Question Filters</div>', unsafe_allow_html=True)
 
@@ -472,6 +481,7 @@ with col_output:
                         "raw_answer": raw_answer,
                         "time_limit": time_limit,
                         "style_preset": style_preset,
+                        "rubric_name": rubric_name,
                         "question_id": st.session_state.current_question["id"],
                         "input_mode": answer_mode.lower(),
                         "iteration_count": 0,

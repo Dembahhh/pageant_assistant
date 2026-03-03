@@ -14,8 +14,8 @@ class TestLoadQuestions:
         questions = load_questions()
         assert isinstance(questions, tuple)
 
-    def test_has_at_least_30_questions(self):
-        assert len(load_questions()) >= 30
+    def test_has_at_least_45_questions(self):
+        assert len(load_questions()) >= 45
 
     def test_each_question_has_required_fields(self):
         required = {"id", "text", "pageant_type", "question_type", "difficulty"}
@@ -75,3 +75,27 @@ class TestGetFilterOptions:
         for key, values in opts.items():
             ids = [v[0] for v in values]
             assert "any" in ids, f"Missing 'any' option for {key}"
+
+    def test_new_pageant_types_in_filter_options(self):
+        opts = get_filter_options()
+        pageant_ids = [v[0] for v in opts["pageant_type"]]
+        assert "miss_grand" in pageant_ids
+        assert "miss_earth" in pageant_ids
+        assert "miss_charm" in pageant_ids
+
+
+class TestNewPageantQuestions:
+    @pytest.mark.parametrize("pageant_type", ["miss_grand", "miss_earth", "miss_charm"])
+    def test_new_pageant_type_exists_in_bank(self, pageant_type):
+        types = {q["pageant_type"] for q in load_questions()}
+        assert pageant_type in types
+
+    @pytest.mark.parametrize("pageant_type", ["miss_grand", "miss_earth", "miss_charm"])
+    def test_new_pageant_has_5_questions(self, pageant_type):
+        count = sum(1 for q in load_questions() if q["pageant_type"] == pageant_type)
+        assert count == 5
+
+    @pytest.mark.parametrize("pageant_type", ["miss_grand", "miss_earth", "miss_charm"])
+    def test_filter_by_new_pageant_type(self, pageant_type):
+        q = get_random_question(pageant_type=pageant_type)
+        assert q["pageant_type"] == pageant_type

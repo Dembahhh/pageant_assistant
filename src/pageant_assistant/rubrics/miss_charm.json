@@ -1,0 +1,65 @@
+{
+  "pageant": "Miss Charm",
+  "version": "1.0",
+  "dimensions": [
+    {
+      "name": "Warmth & Charisma",
+      "weight": 1.3,
+      "description": "Does the answer feel inviting, genuine, and emotionally engaging? Would the audience feel connected to the speaker?"
+    },
+    {
+      "name": "Cultural Representation",
+      "weight": 1.2,
+      "description": "Does the answer showcase the contestant's culture, heritage, or national identity with pride and specificity?"
+    },
+    {
+      "name": "Storytelling Quality",
+      "weight": 1.1,
+      "description": "Does the answer use narrative structure — a vivid scene, moment, or anecdote — rather than abstract statements?"
+    },
+    {
+      "name": "Directness & Clarity",
+      "weight": 1.0,
+      "description": "Does the first sentence directly answer the question? Is the answer easy to follow?"
+    },
+    {
+      "name": "Structure & Flow",
+      "weight": 1.0,
+      "description": "Does it follow a logical arc — personal hook, cultural anchor, application, close? Smooth transitions?"
+    },
+    {
+      "name": "Authenticity & Specificity",
+      "weight": 1.0,
+      "description": "Does it sound real and personal, not templated? Reflects the contestant's actual personality and experiences?"
+    },
+    {
+      "name": "Closing Strength",
+      "weight": 0.9,
+      "description": "Last line is warm, memorable, and leaves the audience smiling? Ends with connection, not just confidence?"
+    },
+    {
+      "name": "Credibility & Safety",
+      "weight": 0.7,
+      "description": "No unsupported claims? Cultural references are respectful and accurate?"
+    }
+  ],
+  "cap_rules": [
+    {
+      "if_dimension": "Directness & Clarity",
+      "below": 5,
+      "then_max_overall": 7
+    },
+    {
+      "if_dimension": "Warmth & Charisma",
+      "below": 5,
+      "then_max_overall": 6.5
+    }
+  ],
+  "genericness_signals": [
+    "no_personal_story",
+    "no_cultural_reference",
+    "template_language",
+    "persona_not_referenced",
+    "emotionally_flat"
+  ]
+}

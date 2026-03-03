@@ -1,0 +1,65 @@
+{
+  "pageant": "Miss Earth",
+  "version": "1.0",
+  "dimensions": [
+    {
+      "name": "Environmental Knowledge & Advocacy",
+      "weight": 1.4,
+      "description": "Does the answer demonstrate real understanding of environmental issues — climate, biodiversity, pollution, sustainability? Specific facts or frameworks, not vague green sentiment?"
+    },
+    {
+      "name": "Actionable Solutions",
+      "weight": 1.2,
+      "description": "Does the answer propose concrete, realistic actions? Goes beyond 'raise awareness' to name specific initiatives, policies, or behaviors?"
+    },
+    {
+      "name": "Directness & Clarity",
+      "weight": 1.0,
+      "description": "Does the first sentence directly answer the question? Is the answer easy to follow?"
+    },
+    {
+      "name": "Structure & Flow",
+      "weight": 1.0,
+      "description": "Does it follow a logical arc — problem, personal connection, proposed action, close? Smooth transitions?"
+    },
+    {
+      "name": "Authenticity & Specificity",
+      "weight": 1.0,
+      "description": "Does it sound real and personal, not templated? Uses contestant's actual environmental experiences and platform?"
+    },
+    {
+      "name": "Community & Local Impact",
+      "weight": 0.9,
+      "description": "Connects global environmental themes to local or community-level action? Shows grassroots understanding?"
+    },
+    {
+      "name": "Closing Strength",
+      "weight": 0.9,
+      "description": "Last line is memorable and calls to environmental action? Ends with urgency or hope?"
+    },
+    {
+      "name": "Credibility & Safety",
+      "weight": 0.8,
+      "description": "Environmental claims are factually accurate? No debunked statistics or pseudoscience?"
+    }
+  ],
+  "cap_rules": [
+    {
+      "if_dimension": "Directness & Clarity",
+      "below": 5,
+      "then_max_overall": 7
+    },
+    {
+      "if_dimension": "Environmental Knowledge & Advocacy",
+      "below": 4,
+      "then_max_overall": 5.5
+    }
+  ],
+  "genericness_signals": [
+    "vague_sustainability_buzzwords",
+    "no_specific_environmental_issue",
+    "no_actionable_proposal",
+    "template_language",
+    "persona_not_referenced"
+  ]
+}
